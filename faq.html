@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الأسئلة الشائعة | رقميّات ستور</title>
+<meta name="description" content="إجابات عن أكثر الأسئلة تكراراً حول الشراء والتحميل والترخيص والدعم.">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<div id="site-header"></div>
+
+<section class="section">
+  <div class="container" style="max-width:860px">
+    <div class="breadcrumb"><a href="index.html">الرئيسية</a> / الأسئلة الشائعة</div>
+    <div class="section-head"><span class="eyebrow">مركز المساعدة</span>
+      <h2>الأسئلة الشائعة</h2><p>كل ما تحتاج معرفته عن التسوق والتحميل والترخيص.</p></div>
+    <div id="faq"></div>
+    <div class="notice info" style="margin-top:26px">
+      لم تجد إجابتك؟ <a href="contact.html" style="color:var(--brand);font-weight:700">تواصل مع فريق الدعم</a> وسنساعدك فوراً.
+    </div>
+  </div>
+</section>
+
+<div id="site-footer"></div>
+<script src="assets/js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const faqs = [
+    ['كيف أستلم المنتج بعد الشراء؟','بعد إتمام الدفع تظهر روابط التحميل مباشرة في صفحة تأكيد الطلب، وتُرسل أيضاً إلى بريدك الإلكتروني فوراً.'],
+    ['هل يمكنني استخدام المنتج تجارياً؟','نعم، معظم منتجاتنا تأتي مع ترخيص للاستخدام الشخصي والتجاري. يُذكر الترخيص بوضوح في صفحة كل منتج.'],
+    ['ما طرق الدفع المتاحة؟','نقبل مدى، فيزا، ماستركارد، PayPal، Apple Pay، والتحويل البنكي.'],
+    ['هل هناك سياسة استرجاع؟','بما أن المنتجات رقمية وتُسلّم فوراً، فالاسترجاع متاح فقط في حال وجود خلل تقني. راجع <a href="refund.html" style="color:var(--brand)">سياسة الاسترجاع</a>.'],
+    ['كم مرة يمكنني تحميل المنتج؟','تحميلات غير محدودة طوال حياتك من لوحة حسابك في قسم «التحميلات».'],
+    ['هل أحصل على تحديثات مستقبلية؟','نعم، جميع التحديثات المستقبلية للمنتج مجانية تماماً ولا تتطلب أي دفع إضافي.'],
+    ['هل يوجد كود خصم؟','نعم، جرّب الأكواد التالية عند الدفع: <b>SAVE10</b> خصم 10%، و <b>SAVE20</b> خصم 20%.'],
+    ['كيف أضيف منتجي للبيع على المنصة؟','اذهب إلى صفحة <a href="add-product.html" style="color:var(--brand)">إضافة منتج</a>، املأ البيانات، وسيراجعه فريقنا قبل النشر.']
+  ];
+  document.getElementById('faq').innerHTML = faqs.map(([q,a],i)=>`
+    <div class="acc-item ${i===0?'open':''}">
+      <div class="acc-q">${q} <span>${i===0?'−':'+'}</span></div>
+      <div class="acc-a">${a}</div>
+    </div>`).join('');
+  document.querySelectorAll('.acc-item').forEach(it=>{
+    it.querySelector('.acc-q').addEventListener('click', ()=>{
+      const open = it.classList.toggle('open');
+      it.querySelector('.acc-q span').textContent = open ? '−' : '+';
+    });
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تواصل معنا | رقميّات ستور</title>
+<meta name="description" content="تواصل مع فريق دعم رقميّات ستور لأي استفسار أو مساعدة.">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<div id="site-header"></div>
+
+<section class="section">
+  <div class="container">
+    <div class="breadcrumb"><a href="index.html">الرئيسية</a> / تواصل معنا</div>
+    <div class="section-head"><span class="eyebrow">نسعد بخدمتك</span>
+      <h2>تواصل معنا</h2><p>فريقنا جاهز لمساعدتك على مدار الساعة. اختر الطريقة الأنسب لك.</p></div>
+
+    <div class="grid grid-3" style="margin-bottom:44px">
+      <div class="card feature"><div class="f-ico">📧</div><h3>البريد الإلكتروني</h3>
+        <p>support@raqmiyat.store</p><p style="color:var(--brand);font-weight:700">ردّ خلال 24 ساعة</p></div>
+      <div class="card feature"><div class="f-ico" style="background:linear-gradient(135deg,#10b981,#22c55e)">📱</div>
+        <h3>واتساب</h3><p dir="ltr">+966 55 000 0000</p><p style="color:var(--brand);font-weight:700">دعم فوري</p></div>
+      <div class="card feature"><div class="f-ico" style="background:linear-gradient(135deg,#f59e0b,#f97316)">📍</div>
+        <h3>العنوان</h3><p>الرياض، المملكة العربية السعودية</p><p style="color:var(--brand);font-weight:700">الأحد – الخميس</p></div>
+    </div>
+
+    <div class="cart-layout">
+      <form class="prose" id="cForm" style="padding:28px">
+        <h2 style="margin-top:0">أرسل لنا رسالة</h2>
+        <div class="form-row">
+          <div class="form-group"><label>الاسم *</label><input name="name" required placeholder="اسمك الكامل"></div>
+          <div class="form-group"><label>البريد الإلكتروني *</label><input type="email" name="email" required placeholder="you@email.com"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>رقم الجوال</label><input name="phone" placeholder="+966 5X XXX XXXX"></div>
+          <div class="form-group"><label>الموضوع *</label>
+            <select name="subject"><option>استفسار عام</option><option>مشكلة في الدفع</option>
+              <option>مشكلة في التحميل</option><option>اقتراح / شكوى</option><option>الشراكة التجارية</option></select></div>
+        </div>
+        <div class="form-group"><label>الرسالة *</label>
+          <textarea name="msg" required placeholder="اكتب رسالتك بالتفصيل..."></textarea></div>
+        <button class="btn btn-primary btn-block">إرسال الرسالة ✉️</button>
+      </form>
+
+      <aside class="summary">
+        <h3>معلومات التواصل</h3>
+        <div class="acc-item open">
+          <div class="acc-q">🕐 ساعات العمل <span>−</span></div>
+          <div class="acc-a">الأحد – الخميس: 9ص – 6م<br>الجمعة – السبت: دعم طارئ فقط</div>
+        </div>
+        <div class="acc-item">
+          <div class="acc-q">⚡ متوسط زمن الرد <span>+</span></div>
+          <div class="acc-a">عادةً خلال ساعتين في أيام العمل، وخلال 24 ساعة كحد أقصى.</div>
+        </div>
+        <div class="acc-item">
+          <div class="acc-q">🌍 اللغات المدعومة <span>+</span></div>
+          <div class="acc-a">دعم باللغة العربية والإنجليزية.</div>
+        </div>
+        <div class="notice info" style="margin-top:18px">💬 هل تبحث عن إجابة سريعة؟ راجع
+          <a href="faq.html" style="color:var(--brand);font-weight:700">الأسئلة الشائعة</a>.</div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<div id="site-footer"></div>
+<script src="assets/js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('cForm').addEventListener('submit', e=>{
+    e.preventDefault();
+    toast('تم استلام رسالتك، سنعاود التواصل قريباً ✓','success');
+    e.target.reset();
+  });
+  document.querySelectorAll('.acc-item').forEach(it=>{
+    it.querySelector('.acc-q').addEventListener('click', ()=>it.classList.toggle('open'));
+  });
+});
+</script>
+</body>
+</html>

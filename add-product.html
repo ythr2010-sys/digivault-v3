@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>إضافة منتج جديد | رقميّات ستور</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<div id="site-header"></div>
+
+<section class="section">
+  <div class="container">
+    <div class="breadcrumb"><a href="index.html">الرئيسية</a> / <a href="dashboard.html">الحساب</a> / إضافة منتج</div>
+    <div class="section-head" style="text-align:start"><h2>إضافة منتج رقمي جديد</h2>
+      <p>املأ الحقول التالية لنشر منتجك في المتجر مباشرة.</p></div>
+
+    <div class="cart-layout">
+      <form class="prose" id="pForm" style="padding:28px">
+        <h2 style="margin-top:0">بيانات المنتج</h2>
+        <div class="form-group"><label>اسم المنتج *</label>
+          <input name="title" required placeholder="مثال: حزمة قوالب سوشال ميديا"></div>
+        <div class="form-row">
+          <div class="form-group"><label>الفئة *</label>
+            <select name="cat">${['تصميم','دورات','قوالب ويب','صوتيات','كتب'].map(c=>`<option>${c}</option>`).join('')}</select></div>
+          <div class="form-group"><label>الأيقونة (إيموجي)</label>
+            <input name="icon" placeholder="📦" maxlength="4" value="📦"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>السعر *</label><input type="number" name="price" required min="0" step="0.01" placeholder="149"></div>
+          <div class="form-group"><label>السعر قبل الخصم</label><input type="number" name="old" min="0" step="0.01" placeholder="199 (اختياري)"></div>
+        </div>
+        <div class="form-group"><label>وصف المنتج *</label>
+          <textarea name="desc" required placeholder="اشرح منتجك ومميزاته وما سيحصل عليه العميل..."></textarea></div>
+        <div class="form-group"><label>الوسوم (مفصولة بفاصلة)</label>
+          <input name="tags" placeholder="قوالب, جاهز, تجاري"></div>
+
+        <h2>صورة المنتج</h2>
+        <div class="dropzone" id="dz">
+          <div class="dz-ico">🖼️</div>
+          <b>اسحب الصورة هنا أو اضغط للاختيار</b>
+          <div class="hint">PNG / JPG — سيتم عرض معاينة فورية (تجريبي محلي)</div>
+          <input type="file" id="file" accept="image/*" hidden>
+        </div>
+        <div class="preview" id="preview"></div>
+
+        <div class="notice info" style="margin-top:20px">🔒 سيتم مراجعة منتجك قبل النشر النهائي لضمان الجودة.</div>
+        <button class="btn btn-primary btn-block" style="margin-top:16px">نشر المنتج الآن ←</button>
+      </form>
+
+      <aside class="summary">
+        <h3>معاينة مباشرة</h3>
+        <div id="pvCard"></div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<div id="site-footer"></div>
+<script src="assets/js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const f = document.getElementById('pForm');
+  const dz = document.getElementById('dz'), file = document.getElementById('file'), prev = document.getElementById('preview');
+  let imgData = '';
+
+  dz.addEventListener('click', ()=>file.click());
+  dz.addEventListener('dragover', e=>{ e.preventDefault(); dz.style.borderColor='var(--brand)' });
+  dz.addEventListener('dragleave', ()=>dz.style.borderColor='');
+  dz.addEventListener('drop', e=>{ e.preventDefault(); dz.style.borderColor=''; if(e.dataTransfer.files[0]) showImg(e.dataTransfer.files[0]) });
+  file.addEventListener('change', ()=> file.files[0] && showImg(file.files[0]));
+  function showImg(f2){
+    const r = new FileReader();
+    r.onload = ev => { imgData = ev.target.result;
+      prev.innerHTML = `<img src="${imgData}" alt="معاينة">`; toast('تم رفع الصورة ✓','success') };
+    r.readAsDataURL(f2);
+  }
+
+  f.addEventListener('input', preview);
+  function preview(){
+    const d = Object.fromEntries(new FormData(f));
+    const p = {title:d.title||'اسم المنتج', cat:d.cat, price:+d.price||0, old:+d.old||0,
+      icon:d.icon||'📦', rating:5, sales:0,
+      img: imgData ? `url(${imgData}) center/cover` : 'linear-gradient(135deg,#6d28d9,#8b5cf6)'};
+    document.getElementById('pvCard').innerHTML = `<div style="max-width:280px">${productCard(p)}</div>`;
+  }
+  preview();
+
+  f.addEventListener('submit', e=>{
+    e.preventDefault();
+    const d = Object.fromEntries(new FormData(f));
+    const data = {title:d.title.trim(), cat:d.cat, price:+d.price, old:+d.old||0,
+      icon:d.icon||'📦', desc:d.desc.trim(),
+      tags:(d.tags||'').split(',').map(s=>s.trim()).filter(Boolean),
+      img: imgData ? `url(${imgData}) center/cover` : 'linear-gradient(135deg,#6d28d9,#8b5cf6)'};
+    addProduct(data);
+    toast('تم نشر المنتج بنجاح ✓','success');
+    setTimeout(()=>location.href='store.html', 800);
+  });
+});
+</script>
+</body>
+</html>

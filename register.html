@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>إنشاء حساب | رقميّات ستور</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<div id="site-header"></div>
+
+<section class="section">
+  <div class="container">
+    <div class="form-wrap">
+      <div class="form-card">
+        <div style="text-align:center;margin-bottom:26px">
+          <div class="logo-mark" style="margin:0 auto 14px;width:54px;height:54px;font-size:26px">◈</div>
+          <h2 style="font-size:24px">إنشاء حساب جديد</h2>
+          <p style="color:var(--muted);font-size:14.5px">انضم إلينا واحصل على منتجاتك الرقمية فوراً</p>
+        </div>
+        <form id="regForm">
+          <div class="form-group"><label>الاسم الكامل</label>
+            <input name="name" required placeholder="مثال: أحمد محمد"></div>
+          <div class="form-group"><label>البريد الإلكتروني</label>
+            <input type="email" name="email" required placeholder="you@email.com"></div>
+          <div class="form-row">
+            <div class="form-group"><label>كلمة المرور</label>
+              <input type="password" name="password" id="pw" required placeholder="6 أحرف على الأقل"></div>
+            <div class="form-group"><label>تأكيد كلمة المرور</label>
+              <input type="password" name="confirm" required placeholder="••••••••"></div>
+          </div>
+          <div class="form-group">
+            <label style="display:flex;gap:8px;align-items:flex-start;font-weight:600;font-size:13.5px">
+              <input type="checkbox" required style="width:auto;margin-top:5px">
+              أوافق على <a href="terms.html" style="color:var(--brand)">الشروط والأحكام</a> و
+              <a href="privacy.html" style="color:var(--brand)">سياسة الخصوصية</a></label>
+          </div>
+          <div class="err" id="err"></div>
+          <button class="btn btn-primary btn-block" style="margin-top:10px">إنشاء الحساب</button>
+        </form>
+        <p style="text-align:center;margin-top:20px;font-size:14.5px;color:var(--muted)">
+          لديك حساب بالفعل؟ <a href="login.html" style="color:var(--brand);font-weight:700">سجّل الدخول</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="site-footer"></div>
+<script src="assets/js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('regForm').addEventListener('submit', e=>{
+    e.preventDefault();
+    const f = Object.fromEntries(new FormData(e.target));
+    const err = document.getElementById('err'); err.classList.remove('show');
+    if(f.password.length < 6){ err.textContent='كلمة المرور يجب أن تكون 6 أحرف على الأقل'; err.classList.add('show'); return }
+    if(f.password !== f.confirm){ err.textContent='كلمتا المرور غير متطابقتين'; err.classList.add('show'); return }
+    try{
+      registerUser({name:f.name.trim(), email:f.email.trim().toLowerCase(), password:f.password});
+      toast('تم إنشاء حسابك بنجاح ✓','success');
+      setTimeout(()=>location.href='dashboard.html', 800);
+    }catch(ex){ err.textContent = ex.message; err.classList.add('show') }
+  });
+});
+</script>
+</body>
+</html>

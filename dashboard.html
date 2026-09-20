@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة الحساب | رقميّات ستور</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<div id="site-header"></div>
+
+<section class="section">
+  <div class="container" id="host"></div>
+</section>
+
+<div id="site-footer"></div>
+<script src="assets/js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const u = currentUser();
+  const host = document.getElementById('host');
+
+  if(!u){
+    host.innerHTML = `<div class="empty"><div class="e-ico">🔐</div>
+      <h3>يجب تسجيل الدخول أولاً</h3>
+      <p style="margin-bottom:20px">سجّل الدخول للوصول إلى لوحة حسابك وطلباتك.</p>
+      <a href="login.html" class="btn btn-primary">تسجيل الدخول</a></div>`;
+    return;
+  }
+
+  const orders = myOrders();
+  const spent = orders.reduce((s,o)=>s+o.total,0);
+  const customCount = read(LS.products,[]).length;
+
+  host.innerHTML = `
+    <div class="breadcrumb"><a href="index.html">الرئيسية</a> / لوحة الحساب</div>
+    <div class="dash-grid">
+      <aside class="side-menu">
+        <div style="text-align:center;padding:14px 8px 20px;border-bottom:1px solid var(--border);margin-bottom:12px">
+          <div class="logo-mark" style="margin:0 auto 12px;width:60px;height:60px;font-size:26px;border-radius:50%">${u.avatar}</div>
+          <b>${u.name}</b><div style="font-size:13px;color:var(--muted)">${u.email}</div>
+        </div>
+        <a class="active" data-tab="overview">📊 نظرة عامة</a>
+        <a data-tab="orders">📦 طلباتي</a>
+        <a data-tab="downloads">⬇️ التحميلات</a>
+        <a data-tab="profile">⚙️ الملف الشخصي</a>
+        <a href="add-product.html">➕ إضافة منتج</a>
+        <a onclick="logoutUser()" style="color:var(--danger)">🚪 تسجيل الخروج</a>
+      </aside>
+
+      <div>
+        <div class="tab-panel active" data-panel="overview">
+          <div class="kpis">
+            <div class="kpi"><b>${orders.length}</b><span>إجمالي الطلبات</span></div>
+            <div class="kpi"><b>${money(spent)}</b><span>إجمالي المشتريات</span></div>
+            <div class="kpi"><b>${customCount}</b><span>منتجات أضفتها</span></div>
+          </div>
+          <h3 style="margin-bottom:14px">أحدث الطلبات</h3>
+          ${orders.length ? orderTable(orders.slice(0,3)) :
+            `<div class="empty"><div class="e-ico">🧾</div><h3>لا توجد طلبات بعد</h3>
+             <a href="store.html" class="btn btn-primary" style="margin-top:14px">ابدأ التسوق ←</a></div>`}
+        </div>
+
+        <div class="tab-panel" data-panel="orders">
+          <h3 style="margin-bottom:14px">كل الطلبات</h3>
+          ${orders.length ? orderTable(orders) : `<div class="empty"><div class="e-ico">🧾</div><h3>لا توجد طلبات</h3></div>`}
+        </div>
+
+        <div class="tab-panel" data-panel="downloads">
+          <h3 style="margin-bottom:14px">منتجاتك القابلة للتحميل</h3>
+          ${orders.length ? orders.flatMap(o=>o.items).map(it=>`
+            <div class="cart-item">
+              <div class="ci-thumb" style="background:linear-gradient(135deg,#6d28d9,#8b5cf6)">📦</div>
+              <div class="ci-info"><h4>${it.title}</h4><small>ترخيص دائم · جاهز للتحميل</small></div>
+              <button class="btn btn-primary btn-sm" onclick="toast('بدأ تحميل المنتج... (تجريبي)','success')">تحميل ⬇️</button>
+            </div>`).join('') :
+            `<div class="empty"><div class="e-ico">⬇️</div><h3>لا توجد ملفات للتحميل بعد</h3></div>`}
+        </div>
+
+        <div class="tab-panel" data-panel="profile">
+          <div class="prose">
+            <h2>الملف الشخصي</h2>
+            <div class="form-row">
+              <div class="form-group"><label>الاسم الكامل</label><input id="pn" value="${u.name}"></div>
+              <div class="form-group"><label>البريد الإلكتروني</label><input value="${u.email}" disabled></div>
+            </div>
+            <div class="form-group"><label>رقم الجوال</label><input placeholder="+966 5X XXX XXXX"></div>
+            <div class="form-group"><label>نبذة عنك</label><textarea placeholder="اكتب نبذة قصيرة..."></textarea></div>
+            <button class="btn btn-primary" onclick="saveProfile()">حفظ التغييرات</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+  function orderTable(list){
+    return `<table class="table"><thead><tr>
+      <th>رقم الطلب</th><th>التاريخ</th><th>المنتجات</th><th>الإجمالي</th><th>الحالة</th></tr></thead><tbody>
+      ${list.map(o=>`<tr>
+        <td><b>${o.id}</b></td>
+        <td>${new Date(o.date).toLocaleDateString('ar-SA')}</td>
+        <td>${o.items.map(i=>i.title).join('، ')}</td>
+        <td><b>${money(o.total)}</b></td>
+        <td><span class="status ok">مكتمل ✓</span></td></tr>`).join('')}
+      </tbody></table>`;
+  }
+
+  host.querySelectorAll('.side-menu a[data-tab]').forEach(a=>{
+    a.addEventListener('click', ()=>{
+      host.querySelectorAll('.side-menu a').forEach(x=>x.classList.remove('active'));
+      a.classList.add('active');
+      host.querySelectorAll('.tab-panel').forEach(p=>p.classList.toggle('active', p.dataset.panel===a.dataset.tab));
+    });
+  });
+});
+
+function saveProfile(){
+  const users = getUsers(); const s = read(LS.session,null);
+  const idx = users.findIndex(x=>x.email===s.email);
+  if(idx>-1){ users[idx].name = document.getElementById('pn').value; users[idx].avatar = users[idx].name.charAt(0);
+    write(LS.users, users); toast('تم حفظ التغييرات ✓','success'); renderHeader(); }
+}
+</script>
+</body>
+</html>

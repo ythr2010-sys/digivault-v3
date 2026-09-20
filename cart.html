@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>سلة التسوق | رقميّات ستور</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<div id="site-header"></div>
+
+<section class="section">
+  <div class="container">
+    <div class="breadcrumb"><a href="index.html">الرئيسية</a> / سلة التسوق</div>
+    <div class="section-head" style="text-align:start"><h2>سلة التسوق</h2>
+      <p>راجع منتجاتك قبل إتمام عملية الشراء.</p></div>
+
+    <div class="cart-layout" id="layout">
+      <div>
+        <div id="items"></div>
+        <div id="emptyBox"></div>
+      </div>
+      <aside class="summary" id="summary">
+        <h3>ملخّص الطلب</h3>
+        <div class="sum-row"><span>المجموع الفرعي</span><span id="sub">-</span></div>
+        <div class="sum-row"><span>الخصم</span><span id="disc">-</span></div>
+        <div class="sum-row"><span>الضريبة (15%)</span><span id="tax">-</span></div>
+        <div class="sum-row total"><span>الإجمالي</span><b id="tot">-</b></div>
+        <div class="form-group" style="margin:18px 0 12px">
+          <input id="coupon" placeholder="كود الخصم (جرّب: SAVE10)">
+        </div>
+        <button class="btn btn-outline btn-block btn-sm" onclick="applyCoupon()">تطبيق الكود</button>
+        <a href="checkout.html" class="btn btn-primary btn-block" style="margin-top:14px">إتمام الشراء ←</a>
+        <a href="store.html" class="btn btn-ghost btn-block btn-sm" style="margin-top:10px">متابعة التسوق</a>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<div id="site-footer"></div>
+<script src="assets/js/app.js"></script>
+<script>
+let discount = 0;
+function applyCoupon(){
+  const c = document.getElementById('coupon').value.trim().toUpperCase();
+  if(c === 'SAVE10'){ discount = 0.10; toast('تم تطبيق خصم 10% ✓','success') }
+  else if(c === 'SAVE20'){ discount = 0.20; toast('تم تطبيق خصم 20% ✓','success') }
+  else { discount = 0; toast('كود الخصم غير صالح','error') }
+  render();
+}
+function pay(id,q){ setQty(id,q); render() }
+function del(id){ removeFromCart(id); toast('تم حذف المنتج من السلة'); render() }
+function render(){
+  const items = cartItems();
+  const host = document.getElementById('items');
+  const layout = document.getElementById('layout');
+
+  if(!items.length){
+    host.innerHTML = '';
+    document.getElementById('summary').style.display='none';
+    document.getElementById('emptyBox').innerHTML = `
+      <div class="empty"><div class="e-ico">🛒</div><h3>سلتك فارغة حالياً</h3>
+      <p style="margin-bottom:20px">أضف بعض المنتجات الرقمية لتبدأ عملية الشراء.</p>
+      <a href="store.html" class="btn btn-primary">تصفّح المتجر ←</a></div>`;
+    return;
+  }
+  document.getElementById('summary').style.display='block';
+  document.getElementById('emptyBox').innerHTML='';
+
+  host.innerHTML = items.map(c=>`
+    <div class="cart-item">
+      <div class="ci-thumb" style="background:${c.product.img}">${c.product.icon||'📦'}</div>
+      <div class="ci-info">
+        <h4>${c.product.title}</h4>
+        <small>${c.product.cat} · ${money(c.product.price)} للوحدة</small>
+      </div>
+      <div class="qty">
+        <button onclick="pay('${c.id}',${c.qty-1})">−</button>
+        <span>${c.qty}</span>
+        <button onclick="pay('${c.id}',${c.qty+1})">+</button>
+      </div>
+      <b style="min-width:100px;text-align:center">${money(c.product.price*c.qty)}</b>
+      <button class="icon-btn" onclick="del('${c.id}')" aria-label="حذف">🗑</button>
+    </div>`).join('');
+
+  const sub = cartSubtotal();
+  const d = sub * discount;
+  const tax = (sub - d) * 0.15;
+  document.getElementById('sub').textContent = money(sub);
+  document.getElementById('disc').textContent = '- ' + money(d);
+  document.getElementById('tax').textContent = money(tax);
+  document.getElementById('tot').textContent = money(sub - d + tax);
+}
+document.addEventListener('DOMContentLoaded', render);
+</script>
+</body>
+</html>

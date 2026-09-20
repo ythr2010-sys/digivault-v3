@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>المتجر | رقميّات ستور</title>
+<meta name="description" content="تصفّح كل المنتجات الرقمية: قوالب، دورات، كتب، أدوات مع بحث وتصفية وترتيب.">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<div id="site-header"></div>
+
+<section class="section">
+  <div class="container">
+    <div class="breadcrumb"><a href="index.html">الرئيسية</a> / المتجر</div>
+    <div class="section-head" style="text-align:start;margin-bottom:26px">
+      <span class="eyebrow">المتجر</span>
+      <h2>كل المنتجات الرقمية</h2>
+      <p>ابحث، صنّف، ورتّب للوصول إلى منتجك المثالي بسرعة.</p>
+    </div>
+
+    <div class="toolbar">
+      <div class="search-box"><input type="search" id="q" placeholder="ابحث عن منتج، فئة، أو وسم..."></div>
+      <select class="select" id="cat"></select>
+      <select class="select" id="sort">
+        <option value="pop">الأكثر مبيعاً</option>
+        <option value="low">السعر: الأقل أولاً</option>
+        <option value="high">السعر: الأعلى أولاً</option>
+        <option value="rate">الأعلى تقييماً</option>
+        <option value="new">الأحدث</option>
+      </select>
+    </div>
+    <div class="chips" id="chips"></div>
+    <div class="result-count" id="count"></div>
+
+    <div class="grid grid-4" id="grid"></div>
+    <div class="empty" id="empty" style="display:none">
+      <div class="e-ico">🔍</div><h3>لا توجد نتائج مطابقة</h3>
+      <p>جرّب تعديل كلمات البحث أو إزالة بعض الفلاتر.</p>
+    </div>
+  </div>
+</section>
+
+<div id="site-footer"></div>
+<script src="assets/js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(location.search);
+  const qEl=document.getElementById('q'), catEl=document.getElementById('cat'),
+        sortEl=document.getElementById('sort'), gridEl=document.getElementById('grid'),
+        countEl=document.getElementById('count'), emptyEl=document.getElementById('empty'),
+        chipsEl=document.getElementById('chips');
+
+  catEl.innerHTML = CATEGORIES.map(c=>`<option value="${c}">${c}</option>`).join('');
+  chipsEl.innerHTML = CATEGORIES.map(c=>`<button class="chip" data-c="${c}">${c}</button>`).join('');
+
+  let state = { q:'', cat: params.get('cat') || 'الكل', sort:'pop' };
+  qEl.value = state.q;
+
+  function chipSync(){ [...chipsEl.children].forEach(b=>b.classList.toggle('active', b.dataset.c===state.cat)) }
+  function apply(){
+    let list = getProducts().slice();
+    if(state.cat !== 'الكل') list = list.filter(p=>p.cat===state.cat);
+    if(state.q.trim()){
+      const q = state.q.trim().toLowerCase();
+      list = list.filter(p => (p.title+p.cat+(p.tags||[]).join('')+p.desc).toLowerCase().includes(q));
+    }
+    const s = state.sort;
+    if(s==='low') list.sort((a,b)=>a.price-b.price);
+    else if(s==='high') list.sort((a,b)=>b.price-a.price);
+    else if(s==='rate') list.sort((a,b)=>b.rating-a.rating);
+    else if(s==='pop') list.sort((a,b)=>b.sales-a.sales);
+    else if(s==='new') list.reverse();
+
+    countEl.textContent = `عرض ${list.length} من أصل ${getProducts().length} منتج`;
+    gridEl.innerHTML = list.map(productCard).join('');
+    emptyEl.style.display = list.length ? 'none' : 'block';
+    [...gridEl.children].forEach((el,i)=>el.style.animationDelay=(i%8*50)+'ms');
+    chipSync();
+    catEl.value = state.cat;
+  }
+  qEl.addEventListener('input', e=>{ state.q=e.target.value; apply() });
+  catEl.addEventListener('change', e=>{ state.cat=e.target.value; apply() });
+  sortEl.addEventListener('change', e=>{ state.sort=e.target.value; apply() });
+  chipsEl.addEventListener('click', e=>{ const b=e.target.closest('.chip'); if(b){ state.cat=b.dataset.c; apply() } });
+  apply();
+});
+</script>
+</body>
+</html>

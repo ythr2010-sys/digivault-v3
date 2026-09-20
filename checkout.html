@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>إتمام الشراء | رقميّات ستور</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<div id="site-header"></div>
+
+<section class="section">
+  <div class="container">
+    <div class="breadcrumb"><a href="index.html">الرئيسية</a> / <a href="cart.html">السلة</a> / إتمام الشراء</div>
+    <div class="section-head" style="text-align:start"><h2>إتمام عملية الشراء</h2>
+      <p>أدخل بياناتك لإتمام الطلب واستلام منتجاتك فوراً.</p></div>
+
+    <div class="cart-layout" id="layout">
+      <form class="prose" id="form" style="padding:28px">
+        <h2 style="margin-top:0">بيانات المشتري</h2>
+        <div class="form-row">
+          <div class="form-group"><label>الاسم الكامل *</label><input name="name" required placeholder="مثال: أحمد محمد"></div>
+          <div class="form-group"><label>البريد الإلكتروني *</label><input type="email" name="email" required placeholder="you@email.com"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>رقم الجوال *</label><input name="phone" required placeholder="+966 5X XXX XXXX"></div>
+          <div class="form-group"><label>المدينة</label><input name="address" placeholder="الرياض"></div>
+        </div>
+        <h2>طريقة الدفع</h2>
+        <div class="form-group">
+          <label>اختر بوابة الدفع</label>
+          <select name="pay">
+            <option>بطاقة مدى / فيزا</option><option>PayPal</option>
+            <option>تحويل بنكي</option><option>Apple Pay</option>
+          </select>
+        </div>
+        <div class="notice info">🔒 جميع المعاملات مُشفّرة وآمنة تماماً. بياناتك محمية وفق سياسة الخصوصية.</div>
+        <button type="submit" class="btn btn-primary btn-block" style="margin-top:16px">تأكيد الدفع وشراء المنتجات ←</button>
+      </form>
+
+      <aside class="summary">
+        <h3>ملخّص الطلب</h3>
+        <div id="mini"></div>
+        <div class="sum-row total" style="margin-top:16px"><span>الإجمالي</span><b id="tot">-</b></div>
+      </aside>
+    </div>
+
+    <div id="success" style="display:none"></div>
+  </div>
+</section>
+
+<div id="site-footer"></div>
+<script src="assets/js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const items = cartItems();
+  if(!items.length){ document.getElementById('layout').innerHTML =
+    `<div class="empty" style="grid-column:1/-1"><div class="e-ico">🛒</div>
+     <h3>لا يوجد منتجات لإتمام الشراء</h3>
+     <a href="store.html" class="btn btn-primary" style="margin-top:16px">تصفّح المتجر ←</a></div>`; return }
+
+  const u = currentUser();
+  if(u){ document.querySelector('[name=name]').value = u.name; document.querySelector('[name=email]').value = u.email }
+
+  document.getElementById('mini').innerHTML = items.map(c=>
+    `<div class="sum-row"><span>${c.product.title} × ${c.qty}</span><span>${money(c.product.price*c.qty)}</span></div>`).join('');
+  const total = cartSubtotal();
+  document.getElementById('tot').textContent = money(total);
+
+  document.getElementById('form').addEventListener('submit', e=>{
+    e.preventDefault();
+    const f = Object.fromEntries(new FormData(e.target));
+    let order;
+    try{ order = placeOrder(f) }catch(err){ toast(err.message,'error'); return }
+    document.getElementById('layout').style.display='none';
+    const box = document.getElementById('success'); box.style.display='block';
+    box.innerHTML = `
+      <div class="prose" style="text-align:center;max-width:640px;margin:0 auto">
+        <div style="font-size:64px">✅</div>
+        <h2>تم إتمام طلبك بنجاح!</h2>
+        <p>شكراً ${order.name}! رقم طلبك هو <b style="color:var(--brand)">${order.id}</b>.</p>
+        <p>تم إرسال روابط التحميل إلى بريدك: <b>${order.email}</b></p>
+        <div class="sum-row total" style="justify-content:center;gap:14px"><span>الإجمالي المدفوع</span><b>${money(order.total)}</b></div>
+        <div style="display:flex;gap:12px;justify-content:center;margin-top:24px;flex-wrap:wrap">
+          <a href="dashboard.html" class="btn btn-primary">الذهاب إلى لوحة حسابي</a>
+          <a href="store.html" class="btn btn-outline">متابعة التسوق</a>
+        </div>
+      </div>`;
+    toast('تم إنشاء الطلب بنجاح ✓','success');
+  });
+});
+</script>
+</body>
+</html>

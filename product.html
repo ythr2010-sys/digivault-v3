@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تفاصيل المنتج | رقميّات ستور</title>
+<meta name="description" content="تفاصيل المنتج الرقمي: الوصف، المميزات، المحتويات وتقييمات العملاء.">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<div id="site-header"></div>
+
+<section class="section">
+  <div class="container">
+    <div class="breadcrumb"><a href="index.html">الرئيسية</a> / <a href="store.html">المتجر</a> / <span id="crumb">المنتج</span></div>
+    <div id="productHost"></div>
+
+    <div class="tabs">
+      <div class="tab active" data-t="desc">الوصف</div>
+      <div class="tab" data-t="inc">ماذا ستحصل عليه</div>
+      <div class="tab" data-t="rev">التقييمات</div>
+    </div>
+    <div class="prose" id="tabBody"></div>
+
+    <div class="section-head" style="margin:60px 0 30px"><h2>منتجات مشابهة</h2></div>
+    <div class="grid grid-4" id="related"></div>
+  </div>
+</section>
+
+<div id="site-footer"></div>
+<script src="assets/js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const id = new URLSearchParams(location.search).get('id');
+  const p = getProduct(id) || getProducts()[0];
+  document.getElementById('crumb').textContent = p.title;
+  document.title = p.title + ' | رقميّات ستور';
+
+  const sale = p.old && p.old > p.price;
+  const off = sale ? Math.round((1-p.price/p.old)*100) : 0;
+
+  document.getElementById('productHost').innerHTML = `
+    <div class="product-hero">
+      <div class="product-visual" style="background:${p.img}">
+        <span>${p.icon||'📦'}</span>
+      </div>
+      <div>
+        <span class="eyebrow">${p.cat}</span>
+        <h1 style="font-size:clamp(24px,3vw,36px);font-weight:800;margin-bottom:12px">${p.title}</h1>
+        <div class="p-meta" style="font-size:15px">
+          <span class="stars">${stars(p.rating)}</span><span>${p.rating}</span>
+          <span>·</span><span>${p.sales} مبيع</span><span>·</span><span>متوفر ✓</span>
+        </div>
+        <p style="color:var(--muted);margin:16px 0 20px">${p.desc}</p>
+        <div class="p-price">
+          <b style="font-size:32px">${money(p.price)}</b>
+          ${sale?`<s>${money(p.old)}</s><span class="p-sale" style="position:static">وفّر ${off}%</span>`:''}
+        </div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px">
+          <button class="btn btn-primary" onclick="addToCart('${p.id}');setTimeout(()=>location.href='cart.html',700)">اشترِ الآن ←</button>
+          <button class="btn btn-outline" onclick="addToCart('${p.id}')">أضف إلى السلة 🛒</button>
+        </div>
+        <div class="notice info">
+          ⚡ <b>تسليم فوري:</b> يصل رابط التحميل إلى بريدك مباشرة بعد إتمام الدفع. ترخيص مدى الحياة لاستخدام شخصي وتجاري.
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px">
+          <div class="kpi"><b>♾️</b><span>ترخيص دائم</span></div>
+          <div class="kpi"><b>🔄</b><span>تحديثات مجانية</span></div>
+          <div class="kpi"><b>💬</b><span>دعم 24/7</span></div>
+        </div>
+      </div>
+    </div>`;
+
+  const tabs = {
+    desc: `<h2>وصف المنتج</h2><p>${p.desc}</p>
+           <p>منتج رقمي عالي الجودة صُمّم بعناية ليوفّر عليك الوقت والجهد. يأتي جاهزاً للاستخدام مباشرة مع ملفات مصدرية قابلة للتعديل بالكامل.</p>
+           <h2>المواصفات</h2>
+           <ul><li>الفئة: ${p.cat}</li><li>صيغة التسليم: ملفات رقمية قابلة للتحميل</li>
+           <li>الترخيص: استخدام شخصي وتجاري</li><li>التحديثات: مجانية مدى الحياة</li></ul>`,
+    inc: `<h2>ماذا ستحصل عليه؟</h2>
+          <ul><li>ملف المنتج الرئيسي بصيغة عالية الجودة</li>
+          <li>ملفات مصدرية قابلة للتعديل</li>
+          <li>دليل استخدام بالعربية خطوة بخطوة</li>
+          <li>وصول دائم لصفحة التحميل والتحديثات</li>
+          <li>دعم فني مباشر من فريقنا</li></ul>
+          <div class="notice warn">💡 جميع الملفات تُسلّم رقمياً؛ لا يوجد شحن فيزيائي.</div>`,
+    rev: `<h2>تقييمات العملاء</h2>
+      ${[['أحمد العتيبي',5,'جودة ممتازة وفوق التوقعات، أنصح به بشدة.'],['سارة منصور',5,'استفدت منه كثيراً في مشروعي الأخير. خدمة عملاء سريعة.'],['خالد الحربي',4,'منتج جيد جداً، فقط كنت أتمنى شرحاً أطول قليلاً.']]
+        .map(([n,r,t])=>`<div style="border-bottom:1px solid var(--border);padding:16px 0">
+          <b>${n}</b> <span class="stars">${stars(r)}</span><p style="margin-top:6px">"${t}"</p></div>`).join('')}`
+  };
+  const body = document.getElementById('tabBody');
+  function setTab(k){ body.innerHTML = tabs[k];
+    document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.t===k)) }
+  document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>setTab(t.dataset.t)));
+  setTab('desc');
+
+  const rel = getProducts().filter(x=>x.id!==p.id && x.cat===p.cat).slice(0,4);
+  const fill = rel.length ? rel : getProducts().filter(x=>x.id!==p.id).slice(0,4);
+  document.getElementById('related').innerHTML = fill.map(productCard).join('');
+});
+</script>
+</body>
+</html>
