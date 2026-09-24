@@ -1,104 +1,268 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" data-theme="light">
+<html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>إضافة منتج جديد | رقميّات ستور</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أضف منتجك للبيع | الخزنة الرقمية</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-main:#0a0a12; --bg-card:#141424; --bg-sidebar:#10101c; --accent-cyan:#00d2ff; --accent-purple:#8a2be2; --accent-green:#00e676; --danger-red:#ff4757; --border-line:rgba(255,255,255,.08); --text-main:#fff; --text-sub:#a0a0c0; }
+        * { box-sizing:border-box; margin:0; padding:0; }
+        body { font-family:'Tajawal',sans-serif; background:var(--bg-main); color:var(--text-main); line-height:1.6; }
+        .page-wrapper { display:flex; min-height:100vh; }
+        .sidebar { width:260px; background:var(--bg-sidebar); border-left:1px solid var(--border-line); padding:25px 15px; display:flex; flex-direction:column; gap:20px; }
+        .sidebar-menu { list-style:none; display:flex; flex-direction:column; gap:10px; }
+        .sidebar-menu li a { display:flex; align-items:center; gap:12px; color:var(--text-sub); text-decoration:none; padding:12px 16px; border-radius:10px; font-weight:600; transition:.3s; }
+        .sidebar-menu li a:hover, .sidebar-menu li a.active { background:rgba(0,210,255,.1); color:var(--accent-cyan); border-right:3px solid var(--accent-cyan); }
+        .main-content { flex:1; padding:30px; max-width:800px; }
+        .card-box { background:var(--bg-card); border:1px solid var(--border-line); border-radius:14px; padding:30px; }
+        .form-group { margin-bottom:18px; }
+        .form-group label { display:block; margin-bottom:8px; font-weight:700; color:var(--text-sub); font-size:.9rem; }
+        .form-group input, .form-group textarea, .form-group select { width:100%; background:#0a0a12; border:1px solid var(--border-line); padding:12px; border-radius:8px; color:#fff; font-family:inherit; font-size:.95rem; outline:none; }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color:var(--accent-cyan); }
+        .row-2 { display:grid; grid-template-columns:1fr 1fr; gap:15px; }
+        .btn-submit { background:linear-gradient(135deg,var(--accent-cyan),var(--accent-purple)); color:#fff; border:none; padding:14px; border-radius:10px; font-weight:800; cursor:pointer; font-family:inherit; font-size:1.05rem; width:100%; transition:.3s; }
+        .btn-submit:hover:not(:disabled) { opacity:.9; transform:translateY(-2px); }
+        .btn-submit:disabled { opacity:.6; cursor:not-allowed; }
+        #authGate { display:none; text-align:center; padding:60px 20px; color:var(--text-sub); }
+        #authGate a { color:var(--accent-cyan); font-weight:800; text-decoration:none; }
+        #alertBox { display:none; margin-bottom:18px; padding:14px; border-radius:10px; font-size:.9rem; font-weight:600; }
+        .alert-success { background:rgba(0,230,118,.1); border:1px solid var(--accent-green); color:var(--accent-green); display:block!important; }
+        .alert-error { background:rgba(255,71,87,.1); border:1px solid var(--danger-red); color:var(--danger-red); display:block!important; }
+        /* منطقة رفع الملفات */
+        .upload-zone { border:2px dashed rgba(0,210,255,.4); border-radius:12px; padding:35px 20px; text-align:center; cursor:pointer; transition:.3s; background:rgba(0,210,255,.03); }
+        .upload-zone:hover, .upload-zone.dragover { border-color:var(--accent-cyan); background:rgba(0,210,255,.07); }
+        .upload-zone .icon { font-size:2.6rem; margin-bottom:10px; }
+        .upload-zone p { color:var(--text-sub); font-size:.9rem; }
+        .upload-zone .file-name { color:var(--accent-green); font-weight:800; margin-top:10px; display:none; }
+        #progressWrap { display:none; margin-top:12px; }
+        #progressBar { height:8px; background:rgba(255,255,255,.08); border-radius:6px; overflow:hidden; }
+        #progressFill { height:100%; width:0%; background:linear-gradient(90deg,var(--accent-cyan),var(--accent-purple)); transition:width .2s; }
+        #progressText { font-size:.8rem; color:var(--text-sub); margin-top:6px; text-align:center; }
+        .or-divider { display:flex; align-items:center; gap:12px; color:var(--text-sub); font-size:.8rem; margin:18px 0; }
+        .or-divider::before, .or-divider::after { content:''; flex:1; height:1px; background:var(--border-line); }
+        @media (max-width:768px){ .page-wrapper{flex-direction:column} .sidebar{width:100%} .row-2{grid-template-columns:1fr} }
+    </style>
+
 </head>
 <body>
-<div id="site-header"></div>
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="logo"><a href="index.html" style="font-size:1.5rem;font-weight:900;color:#fff;text-decoration:none;">الخزنة<span style="color:var(--accent-cyan);">الرقمية</span></a></div>
+            <ul class="sidebar-menu">
+                <li><a href="index.html">🏠 الصفحة الرئيسية</a></li>
+                <li><a href="shop.html">🛍️ تسوق الآن (المنتجات)</a></li>
+                <li><a href="add-product.html" class="active">➕ أضف منتجك للبيع</a></li>
+                <li><a href="cart.html">🛒 سلة المشتريات</a></li>
+                <li><a href="notifications.html">🔔 إشعاراتي</a></li>
+                <li><a href="contact.html">📩 تواصل معنا</a></li>
+            </ul>
+        </aside>
 
-<section class="section">
-  <div class="container">
-    <div class="breadcrumb"><a href="index.html">الرئيسية</a> / <a href="dashboard.html">الحساب</a> / إضافة منتج</div>
-    <div class="section-head" style="text-align:start"><h2>إضافة منتج رقمي جديد</h2>
-      <p>املأ الحقول التالية لنشر منتجك في المتجر مباشرة.</p></div>
+        <main class="main-content">
+            <h1 style="margin-bottom:20px;font-size:1.8rem;">إضافة منتج رقمي جديد للبيع 📦</h1>
 
-    <div class="cart-layout">
-      <form class="prose" id="pForm" style="padding:28px">
-        <h2 style="margin-top:0">بيانات المنتج</h2>
-        <div class="form-group"><label>اسم المنتج *</label>
-          <input name="title" required placeholder="مثال: حزمة قوالب سوشال ميديا"></div>
-        <div class="form-row">
-          <div class="form-group"><label>الفئة *</label>
-            <select name="cat">${['تصميم','دورات','قوالب ويب','صوتيات','كتب'].map(c=>`<option>${c}</option>`).join('')}</select></div>
-          <div class="form-group"><label>الأيقونة (إيموجي)</label>
-            <input name="icon" placeholder="📦" maxlength="4" value="📦"></div>
-        </div>
-        <div class="form-row">
-          <div class="form-group"><label>السعر *</label><input type="number" name="price" required min="0" step="0.01" placeholder="149"></div>
-          <div class="form-group"><label>السعر قبل الخصم</label><input type="number" name="old" min="0" step="0.01" placeholder="199 (اختياري)"></div>
-        </div>
-        <div class="form-group"><label>وصف المنتج *</label>
-          <textarea name="desc" required placeholder="اشرح منتجك ومميزاته وما سيحصل عليه العميل..."></textarea></div>
-        <div class="form-group"><label>الوسوم (مفصولة بفاصلة)</label>
-          <input name="tags" placeholder="قوالب, جاهز, تجاري"></div>
+            <div id="authGate">
+                <p style="margin-bottom:15px;font-size:1.05rem;">🔒 يجب تسجيل الدخول أولاً لتتمكن من إضافة منتج.</p>
+                <a href="login.html">اضغط هنا لتسجيل الدخول</a>
+            </div>
 
-        <h2>صورة المنتج</h2>
-        <div class="dropzone" id="dz">
-          <div class="dz-ico">🖼️</div>
-          <b>اسحب الصورة هنا أو اضغط للاختيار</b>
-          <div class="hint">PNG / JPG — سيتم عرض معاينة فورية (تجريبي محلي)</div>
-          <input type="file" id="file" accept="image/*" hidden>
-        </div>
-        <div class="preview" id="preview"></div>
+            <div id="formWrapper" class="card-box" style="display:none;">
+                <div id="alertBox"></div>
+                <form id="productForm">
+                    <div class="form-group">
+                        <label>عنوان المنتج</label>
+                        <input type="text" id="title" required placeholder="مثال: حزمة تصاميم UI/UX احترافية">
+                    </div>
+                    <div class="form-group">
+                        <label>وصف المنتج</label>
+                        <textarea id="description" rows="4" required placeholder="اشرح مميزات المنتج وما يحصل عليه المشتري..."></textarea>
+                    </div>
+                    <div class="row-2">
+                        <div class="form-group">
+                            <label>السعر ($ أو مجاني)</label>
+                            <input type="text" id="price" required placeholder="مجاني أو 5.00">
+                        </div>
+                        <div class="form-group">
+                            <label>التصنيف</label>
+                            <select id="category" required>
+                                <option value="books">📚 كتب وروايات</option>
+                                <option value="models">🎨 مجسمات 3D/2D</option>
+                                <option value="courses">🎓 دورات تعليمية</option>
+                                <option value="gaming">🎮 ألعاب واشتراكات</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>صورة الغلاف (رابط)</label>
+                        <input type="url" id="imageUrlInput" required placeholder="https://example.com/image.jpg">
+                    </div>
 
-        <div class="notice info" style="margin-top:20px">🔒 سيتم مراجعة منتجك قبل النشر النهائي لضمان الجودة.</div>
-        <button class="btn btn-primary btn-block" style="margin-top:16px">نشر المنتج الآن ←</button>
-      </form>
+                    <div class="form-group">
+                        <label>ملف المنتج 📂 (من حاسوبك مباشرة)</label>
+                        <div class="upload-zone" id="uploadZone">
+                            <div class="icon">📤</div>
+                            <p>اسحب الملف هنا أو اضغط للاختيار</p>
+                            <p style="font-size:.75rem;">ZIP / PDF / MP4 / أي نوع — بحد أقصى 500MB</p>
+                            <input type="file" id="fileInput" style="display:none;">
+                            <div class="file-name" id="fileNameDisplay"></div>
+                        </div>
+                        <div id="progressWrap">
+                            <div id="progressBar"><div id="progressFill"></div></div>
+                            <div id="progressText">0%</div>
+                        </div>
+                    </div>
 
-      <aside class="summary">
-        <h3>معاينة مباشرة</h3>
-        <div id="pvCard"></div>
-      </aside>
+                    <div class="or-divider"><span>أو استخدم رابط تحميل خارجي</span></div>
+                    <div class="form-group">
+                        <label>رابط التحميل (Google Drive / Mega...) - اختياري إذا رفعت ملفاً</label>
+                        <input type="url" id="downloadUrlInput" placeholder="https://drive.google.com/...">
+                    </div>
+
+                    <button type="submit" id="submitBtn" class="btn-submit">📨 إرسال المنتج للمراجعة</button>
+                    <p style="color:var(--text-sub);font-size:.8rem;margin-top:12px;text-align:center;">
+                        سيظهر منتجك في المتجر بعد موافقة الإدارة، وستصلك إشعار بالنتيجة 🔔
+                    </p>
+                </form>
+            </div>
+        </main>
     </div>
-  </div>
-</section>
 
-<div id="site-footer"></div>
-<script src="assets/js/app.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const f = document.getElementById('pForm');
-  const dz = document.getElementById('dz'), file = document.getElementById('file'), prev = document.getElementById('preview');
-  let imgData = '';
+    <script type="module">
+        import { auth, db, storage } from "./firebase-init.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { collection, addDoc, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
-  dz.addEventListener('click', ()=>file.click());
-  dz.addEventListener('dragover', e=>{ e.preventDefault(); dz.style.borderColor='var(--brand)' });
-  dz.addEventListener('dragleave', ()=>dz.style.borderColor='');
-  dz.addEventListener('drop', e=>{ e.preventDefault(); dz.style.borderColor=''; if(e.dataTransfer.files[0]) showImg(e.dataTransfer.files[0]) });
-  file.addEventListener('change', ()=> file.files[0] && showImg(file.files[0]));
-  function showImg(f2){
-    const r = new FileReader();
-    r.onload = ev => { imgData = ev.target.result;
-      prev.innerHTML = `<img src="${imgData}" alt="معاينة">`; toast('تم رفع الصورة ✓','success') };
-    r.readAsDataURL(f2);
-  }
+        let currentUserEmail = null;
+        let selectedFile = null;
 
-  f.addEventListener('input', preview);
-  function preview(){
-    const d = Object.fromEntries(new FormData(f));
-    const p = {title:d.title||'اسم المنتج', cat:d.cat, price:+d.price||0, old:+d.old||0,
-      icon:d.icon||'📦', rating:5, sales:0,
-      img: imgData ? `url(${imgData}) center/cover` : 'linear-gradient(135deg,#6d28d9,#8b5cf6)'};
-    document.getElementById('pvCard').innerHTML = `<div style="max-width:280px">${productCard(p)}</div>`;
-  }
-  preview();
+        onAuthStateChanged(auth, (user) => {
+            if (user && user.email) {
+                currentUserEmail = user.email;
+                document.getElementById("formWrapper").style.display = "block";
+                document.getElementById("authGate").style.display = "none";
+            } else {
+                currentUserEmail = null;
+                document.getElementById("formWrapper").style.display = "none";
+                document.getElementById("authGate").style.display = "block";
+            }
+        });
 
-  f.addEventListener('submit', e=>{
-    e.preventDefault();
-    const d = Object.fromEntries(new FormData(f));
-    const data = {title:d.title.trim(), cat:d.cat, price:+d.price, old:+d.old||0,
-      icon:d.icon||'📦', desc:d.desc.trim(),
-      tags:(d.tags||'').split(',').map(s=>s.trim()).filter(Boolean),
-      img: imgData ? `url(${imgData}) center/cover` : 'linear-gradient(135deg,#6d28d9,#8b5cf6)'};
-    addProduct(data);
-    toast('تم نشر المنتج بنجاح ✓','success');
-    setTimeout(()=>location.href='store.html', 800);
-  });
-});
-</script>
+        // ===== اختيار الملف =====
+        const uploadZone = document.getElementById("uploadZone");
+        const fileInput = document.getElementById("fileInput");
+        const fileNameDisplay = document.getElementById("fileNameDisplay");
+
+        uploadZone.addEventListener("click", () => fileInput.click());
+        fileInput.addEventListener("change", () => handleFile(fileInput.files[0]));
+        uploadZone.addEventListener("dragover", (e) => { e.preventDefault(); uploadZone.classList.add("dragover"); });
+        uploadZone.addEventListener("dragleave", () => uploadZone.classList.remove("dragover"));
+        uploadZone.addEventListener("drop", (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove("dragover");
+            handleFile(e.dataTransfer.files[0]);
+        });
+
+        function handleFile(file) {
+            if (!file) return;
+            if (file.size > 500 * 1024 * 1024) {
+                showAlert("الملف أكبر من 500MB - قسّمه أو استخدم رابطاً خارجياً.", "error");
+                return;
+            }
+            selectedFile = file;
+            fileNameDisplay.textContent = "📎 " + file.name + " (" + (file.size / 1024 / 1024).toFixed(1) + " MB)";
+            fileNameDisplay.style.display = "block";
+        }
+
+        function showAlert(msg, type) {
+            const box = document.getElementById("alertBox");
+            box.className = type === 'success' ? 'alert-success' : 'alert-error';
+            box.textContent = msg;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function setProgress(percent) {
+            document.getElementById("progressWrap").style.display = "block";
+            document.getElementById("progressFill").style.width = percent + "%";
+            document.getElementById("progressText").textContent = percent + "%";
+        }
+
+        document.getElementById("productForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            if (!currentUserEmail) { showAlert("يجب تسجيل الدخول أولاً.", "error"); return; }
+
+            const price = document.getElementById("price").value.trim();
+            if (price !== "مجاني" && (isNaN(parseFloat(price)) || parseFloat(price) < 0)) {
+                showAlert("السعر يجب أن يكون رقماً أو كلمة 'مجاني'.", "error");
+                return;
+            }
+            const externalLink = document.getElementById("downloadUrlInput").value.trim();
+            if (!selectedFile && !externalLink) {
+                showAlert("ارفع ملفاً من حاسوبك أو أدخل رابط تحميل خارجياً.", "error");
+                return;
+            }
+
+            const submitBtn = document.getElementById("submitBtn");
+            submitBtn.disabled = true;
+            submitBtn.textContent = "جاري الإرسال...";
+
+            try {
+                // 1) إنشاء المنتج العام
+                const productData = {
+                    title: document.getElementById("title").value.trim(),
+                    description: document.getElementById("description").value.trim(),
+                    price: price,
+                    category: document.getElementById("category").value,
+                    imageUrl: document.getElementById("imageUrlInput").value.trim(),
+                    sellerEmail: currentUserEmail,
+                    status: "pending",
+                    createdAt: serverTimestamp()
+                };
+                const docRef = await addDoc(collection(db, "products"), productData);
+
+                // 2) رفع الملف من الحاسوب إلى Storage الآمن
+                if (selectedFile) {
+                    const safeName = selectedFile.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+                    const storageRef = ref(storage, `products/${docRef.id}/${Date.now()}_${safeName}`);
+                    const uploadTask = uploadBytesResumable(storageRef, selectedFile);
+
+                    await new Promise((resolve, reject) => {
+                        uploadTask.on('state_changed',
+                            (snap) => setProgress(Math.round((snap.bytesTransferred / snap.totalBytes) * 100)),
+                            (err) => reject(err),
+                            () => resolve()
+                        );
+                    });
+
+                    await setDoc(doc(db, "product_files", docRef.id), {
+                        storagePath: storageRef.fullPath,
+                        fileName: selectedFile.name,
+                        sellerEmail: currentUserEmail
+                    });
+                } else {
+                    await setDoc(doc(db, "product_files", docRef.id), {
+                        downloadUrl: externalLink,
+                        sellerEmail: currentUserEmail
+                    });
+                }
+
+                showAlert("تم إرسال منتجك بنجاح! بانتظار مراجعة الإدارة. ستصلك إشعار 🔔", "success");
+                document.getElementById("productForm").reset();
+                selectedFile = null;
+                fileNameDisplay.style.display = "none";
+                document.getElementById("progressWrap").style.display = "none";
+            } catch (err) {
+                console.error(err);
+                showAlert("حدث خطأ أثناء الإرسال: " + err.message, "error");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = "📨 إرسال المنتج للمراجعة";
+            }
+        });
+    </script>
+    <script type="module" src="./site-enhance.js"></script>
 </body>
 </html>

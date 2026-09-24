@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إشعاراتي | الخزنة الرقمية</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-main:#0a0a12; --bg-card:#141424; --accent-cyan:#00d2ff; --border-line:rgba(255,255,255,.08); --text-main:#fff; --text-sub:#a0a0c0; }
+        * { box-sizing:border-box; margin:0; padding:0; }
+        body { font-family:'Tajawal',sans-serif; background:var(--bg-main); color:var(--text-main); line-height:1.7; min-height:100vh; }
+        .navbar { display:flex; justify-content:space-between; align-items:center; padding:18px 8%; background:var(--bg-card); border-bottom:1px solid var(--border-line); position:sticky; top:0; z-index:100; }
+        .logo a { font-size:1.5rem; font-weight:800; color:var(--text-main); text-decoration:none; }
+        .logo a span { color:var(--accent-cyan); }
+        .nav-link { color:var(--accent-cyan); text-decoration:none; }
+        .main-wrapper { max-width:700px; margin:40px auto; padding:0 20px; }
+        h1 { font-size:1.7rem; margin-bottom:25px; border-right:4px solid var(--accent-cyan); padding-right:12px; }
+        .notif-item { background:var(--bg-card); border:1px solid var(--border-line); border-radius:12px; padding:18px; margin-bottom:12px; }
+        .notif-item.unread { border-right:4px solid var(--accent-cyan); background:rgba(0,210,255,.04); }
+        .notif-item .t { font-weight:800; margin-bottom:5px; }
+        .notif-item .msg { color:var(--text-sub); font-size:.93rem; }
+        .notif-item .time { color:#7a7a95; font-size:.78rem; margin-top:8px; }
+        .empty { text-align:center; padding:50px; color:var(--text-sub); }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="logo"><a href="index.html">الخزنة <span>الرقمية</span></a></div>
+        <a href="profile.html" class="nav-link">← حسابي</a>
+    </header>
+    <div class="main-wrapper">
+        <h1>🔔 إشعاراتي</h1>
+        <div id="notifList"><div class="empty">جاري التحميل...</div></div>
+    </div>
+    <script type="module">
+        import { auth, db, esc } from "./firebase-init.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { collection, query, where, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        onAuthStateChanged(auth, async (user) => {
+            const list = document.getElementById("notifList");
+            if (!user || !user.email) {
+                list.innerHTML = '<div class="empty">قم بتسجيل الدخول لعرض إشعاراتك.</div>';
+                return;
+            }
+            const snap = await getDocs(query(collection(db, "notifications"), where("userEmail", "==", user.email)));
+            let notifs = [];
+            snap.forEach(d => notifs.push({ id: d.id, ...d.data() }));
+            notifs.sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
+
+            if (notifs.length === 0) {
+                list.innerHTML = '<div class="empty">لا توجد إشعارات بعد.</div>';
+                return;
+            }
+            list.innerHTML = notifs.map(n => `
+                <div class="notif-item ${n.read ? '' : 'unread'}" data-id="${n.id}">
+                    <div class="t">${esc(n.title)}</div>
+                    <div class="msg">${esc(n.message)}</div>
+                    <div class="time">${n.createdAt?.toDate ? n.createdAt.toDate().toLocaleString('ar-DZ') : ''}</div>
+                </div>`).join('');
+
+            list.querySelectorAll('.notif-item').forEach(item => {
+                item.addEventListener('click', async () => {
+                    try { await updateDoc(doc(db, "notifications", item.dataset.id), { read: true }); item.classList.remove('unread'); } catch(e){}
+                });
+            });
+        });
+    </script>
+    <script type="module" src="./site-enhance.js"></script>
+</body>
+</html>

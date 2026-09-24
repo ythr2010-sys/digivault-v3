@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إنشاء حساب جديد | الخزنة الرقمية</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #0a0a12;
+            --bg-card: #141424;
+            --accent-cyan: #00d2ff;
+            --accent-purple: #8a2be2;
+            --border-line: rgba(255, 255, 255, 0.08);
+            --text-main: #ffffff;
+            --text-sub: #a0a0c0;
+            --danger-red: #ff4757;
+            --success-green: #2ed573;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Tajawal', sans-serif; background: var(--bg-main); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; justify-content: space-between; }
+        
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: rgba(16, 16, 28, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-line);
+        }
+
+        .logo a { font-size: 1.5rem; font-weight: 900; color: #fff; text-decoration: none; }
+        .logo span { color: var(--accent-cyan); }
+        .nav-links { display: flex; gap: 20px; }
+        .nav-links a { color: var(--text-sub); text-decoration: none; font-weight: 600; transition: 0.3s; }
+        .nav-links a:hover { color: var(--accent-cyan); }
+
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+            flex: 1;
+        }
+
+        .auth-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-line);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 420px;
+            padding: 35px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            animation: fadeIn 0.4s ease;
+        }
+
+        .auth-header { text-align: center; margin-bottom: 25px; }
+        .auth-header h2 { font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; color: #fff; }
+        .auth-header p { color: var(--text-sub); font-size: 0.9rem; }
+
+        .btn-google {
+            width: 100%;
+            background: #ffffff;
+            color: #333;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-family: inherit;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .btn-google svg { width: 20px; height: 20px; }
+        .btn-google:hover { background: #f1f1f1; transform: translateY(-2px); }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: var(--text-sub);
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+        }
+
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--border-line);
+        }
+
+        .divider span { padding: 0 10px; }
+
+        .contact-form { display: flex; flex-direction: column; gap: 15px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group label { font-size: 0.85rem; font-weight: 600; color: var(--text-sub); }
+        .form-group input {
+            padding: 12px 15px;
+            background: #1e1e2f;
+            border: 1px solid var(--border-line);
+            border-radius: 8px;
+            color: #fff;
+            font-family: inherit;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .form-group input:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 8px rgba(0,210,255,0.2);
+        }
+
+        .form-error {
+            color: var(--danger-red);
+            font-size: 0.75rem;
+            display: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            color: #fff;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-family: inherit;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-primary:hover:not(:disabled) { opacity: 0.9; transform: translateY(-2px); }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+        .full-width { width: 100%; }
+
+        .auth-footer { text-align: center; margin-top: 20px; font-size: 0.9rem; color: var(--text-sub); }
+        .auth-footer a { color: var(--accent-cyan); text-decoration: none; font-weight: bold; }
+        .auth-footer a:hover { text-decoration: underline; }
+
+        footer { text-align: center; padding: 20px; color: var(--text-sub); font-size: 0.85rem; border-top: 1px solid var(--border-line); }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="logo"><a href="index.html">الخزنة<span>الرقمية</span></a></div>
+        <div class="nav-links">
+            <a href="index.html">الرئيسية</a>
+            <a href="shop.html">المتجر</a>
+            <a href="terms.html">الشروط</a>
+        </div>
+    </header>
+
+    <main class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h2>إنشاء حساب جديد</h2>
+                <p>سجّل الآن للوصول إلى كافة الأكواد والمنتجات الرقمية</p>
+            </div>
+
+            <button type="button" class="btn-google" id="btnGoogleSignUp">
+                <svg viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.62z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                </svg>
+                التسجيل بواسطة Google
+            </button>
+
+            <div class="divider">
+                <span>أو عبر البريد الإلكتروني</span>
+            </div>
+
+            <form id="signupForm" class="contact-form" novalidate>
+                <div class="form-group">
+                    <label for="fullName">الاسم الكامل</label>
+                    <input type="text" id="fullName" placeholder="محمد ياسر" required>
+                    <span class="form-error" id="nameError">الرجاء إدخال الاسم الكامل (أقل شيء حرفان)</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="signupEmail">البريد الإلكتروني</label>
+                    <input type="email" id="signupEmail" placeholder="example@gmail.com" required>
+                    <span class="form-error" id="emailError">الرجاء إدخال بريد إلكتروني صحيح</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="signupPassword">كلمة المرور (6 أحرف/رموز على الأقل)</label>
+                    <input type="password" id="signupPassword" placeholder="••••••••" minlength="6" required>
+                    <span class="form-error" id="passwordError">كلمة المرور يجب أن تكون 6 أحرف على الأقل</span>
+                </div>
+
+                <button type="submit" class="btn-primary full-width" id="submitBtn">إنشاء الحساب</button>
+            </form>
+
+            <div class="auth-footer">
+                لديك حساب بالفعل؟ <a href="login.html">تسجيل الدخول</a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>جميع الحقوق محفوظة © 2026 الخزنة الرقمية (DigiVault)</p>
+    </footer>
+
+    <!-- كود الربط بـ Firebase (Auth + Firestore) وإدارة المصادقة -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyClXL28rqPQr--pUu3N_Y-X3ihXEAKOyg8",
+            authDomain: "digivault-4c3a3.firebaseapp.com",
+            projectId: "digivault-4c3a3",
+            storageBucket: "digivault-4c3a3.firebasestorage.app",
+            messagingSenderId: "578335534171",
+            appId: "1:578335534171:web:1b108a849c0543f998a37e",
+            measurementId: "G-SZCB59ZZDN"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const googleProvider = new GoogleAuthProvider();
+
+        const SUPER_ADMIN_EMAIL = "ythr2010@gmail.com";
+
+        // دوال المساعدة للتحقق من صحة المدخلات (Validation Helpers)
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        // حفظ وثيقة المستخدم في Firestore
+        async function saveUserToFirestore(user, name, role) {
+            const userRef = doc(db, "users", user.uid);
+            await setDoc(userRef, {
+                uid: user.uid,
+                name: name || user.displayName || "مستخدم الخزنة",
+                email: user.email,
+                role: role,
+                createdAt: serverTimestamp()
+            }, { merge: true });
+        }
+
+        // معالجة نموذج إنشاء الحساب بالبريد الإلكتروني
+        const signupForm = document.getElementById("signupForm");
+        signupForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const fullNameInput = document.getElementById("fullName");
+            const emailInput = document.getElementById("signupEmail");
+            const passwordInput = document.getElementById("signupPassword");
+
+            const nameError = document.getElementById("nameError");
+            const emailError = document.getElementById("emailError");
+            const passwordError = document.getElementById("passwordError");
+
+            const fullName = fullNameInput.value.trim();
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+            const submitBtn = document.getElementById("submitBtn");
+
+            // إعادة تعيين رسائل الأخطاء
+            nameError.style.display = "none";
+            emailError.style.display = "none";
+            passwordError.style.display = "none";
+
+            let isValid = true;
+            if (fullName.length < 2) {
+                nameError.style.display = "block";
+                isValid = false;
+            }
+            if (!validateEmail(email)) {
+                emailError.style.display = "block";
+                isValid = false;
+            }
+            if (password.length < 6) {
+                passwordError.style.display = "block";
+                isValid = false;
+            }
+
+            if (!isValid) return;
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = "جاري إنشاء الحساب...";
+
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                // تحديث اسم المستخدم في Auth
+                await updateProfile(user, { displayName: fullName });
+
+                const role = (email.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase()) ? "admin" : "user";
+
+                // حفظ البيانات في Firestore
+                await saveUserToFirestore(user, fullName, role);
+
+                const userProfile = {
+                    name: fullName,
+                    email: user.email,
+                    role: role,
+                    uid: user.uid
+                };
+
+                localStorage.setItem("isLoggedIn", "true");
+                localStorage.setItem("userProfile", JSON.stringify(userProfile));
+
+                alert("تم إنشاء الحساب بنجاح! أهلاً بك في الخزنة الرقمية.");
+                window.location.href = role === "admin" ? "admin.html" : "profile.html";
+
+            } catch (error) {
+                console.error("خطأ في التسجيل:", error.code, error.message);
+                let errorMsg = "حدث خطأ أثناء إنشاء الحساب.";
+                if (error.code === 'auth/email-already-in-use') errorMsg = "البريد الإلكتروني مستخدم بالفعل. حاول تسجيل الدخول.";
+                if (error.code === 'auth/weak-password') errorMsg = "كلمة المرور ضعيفة جداً، يرجى اختيار 6 أحرف على الأقل.";
+                alert(errorMsg);
+                submitBtn.disabled = false;
+                submitBtn.textContent = "إنشاء الحساب";
+            }
+        });
+
+        // التسجيل السريع بواسطة Google
+        const btnGoogleSignUp = document.getElementById("btnGoogleSignUp");
+        btnGoogleSignUp.addEventListener("click", async () => {
+            try {
+                const result = await signInWithPopup(auth, googleProvider);
+                const user = result.user;
+                const email = user.email;
+                const name = user.displayName || "مستخدم Google";
+
+                const role = (email.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase()) ? "admin" : "user";
+
+                // حفظ البيانات في Firestore للمستخدمين القادمين عبر Google أيضاً
+                await saveUserToFirestore(user, name, role);
+
+                const userProfile = {
+                    name: name,
+                    email: user.email,
+                    role: role,
+                    uid: user.uid
+                };
+
+                localStorage.setItem("isLoggedIn", "true");
+                localStorage.setItem("userProfile", JSON.stringify(userProfile));
+
+                alert("تم التسجيل بواسطة Google بنجاح!");
+                window.location.href = role === "admin" ? "admin.html" : "profile.html";
+
+            } catch (error) {
+                console.error("خطأ في تسجيل Google:", error);
+                alert("تعذر التسجيل بواسطة Google، يرجى التحقق من الاتصال بالشبكة.");
+            }
+        });
+    </script>
+    <script type="module" src="./site-enhance.js"></script>
+</body>
+</html>

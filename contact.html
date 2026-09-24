@@ -1,83 +1,379 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" data-theme="light">
+<html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>تواصل معنا | رقميّات ستور</title>
-<meta name="description" content="تواصل مع فريق دعم رقميّات ستور لأي استفسار أو مساعدة.">
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تواصل معنا والأسئلة الشائعة | الخزنة الرقمية</title>
+    <meta name="description" content="تواصل مع فريق دعم الخزنة الرقمية، أرسل تقييمك، أبلغ عن مشكلة، واستعرض الأسئلة الشائعة حول الخدمات.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #0a0a12;
+            --bg-card: #141424;
+            --bg-sidebar: #10101c;
+            --accent-cyan: #00d2ff;
+            --accent-purple: #8a2be2;
+            --accent-green: #00e676;
+            --danger-red: #ff4757;
+            --border-line: rgba(255, 255, 255, 0.08);
+            --text-main: #ffffff;
+            --text-sub: #a0a0c0;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Tajawal', sans-serif; background: var(--bg-main); color: var(--text-main); line-height: 1.6; }
+        
+        .page-wrapper { display: flex; min-height: 100vh; }
+
+        .sidebar {
+            width: 260px;
+            background: var(--bg-sidebar);
+            border-left: 1px solid var(--border-line);
+            padding: 25px 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .sidebar-menu { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+        .sidebar-menu li a {
+            display: flex; align-items: center; gap: 12px; color: var(--text-sub);
+            text-decoration: none; padding: 12px 16px; border-radius: 10px; font-weight: 600; transition: 0.3s;
+        }
+        .sidebar-menu li a:hover, .sidebar-menu li a.active {
+            background: rgba(0, 210, 255, 0.1); color: var(--accent-cyan); border-right: 3px solid var(--accent-cyan);
+        }
+
+        .main-content { flex: 1; padding: 30px; max-width: 900px; }
+
+        .form-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-line);
+            border-radius: 14px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 700; color: var(--text-sub); }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            background: #0a0a12;
+            border: 1px solid var(--border-line);
+            padding: 12px;
+            border-radius: 8px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: 0.3s;
+        }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: var(--accent-cyan); outline: none; }
+        .form-group input.invalid, .form-group textarea.invalid { border-color: var(--danger-red); }
+
+        .error-msg { color: var(--danger-red); font-size: 0.78rem; margin-top: 4px; display: none; }
+
+        .btn-submit {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            color: #fff; border: none; padding: 14px 25px; border-radius: 8px;
+            font-weight: bold; cursor: pointer; font-family: inherit; font-size: 1rem; width: 100%;
+            transition: 0.3s;
+            display: flex; justify-content: center; align-items: center; gap: 8px;
+        }
+        .btn-submit:hover:not(:disabled) { opacity: 0.9; transform: translateY(-2px); }
+        .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        /* FAQ Accordion Styling */
+        .faq-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-line);
+            border-radius: 10px;
+            margin-bottom: 12px;
+            padding: 18px;
+            transition: 0.3s;
+        }
+        .faq-item:hover { border-color: rgba(0, 210, 255, 0.3); }
+        .faq-question {
+            font-weight: 800;
+            color: var(--accent-cyan);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+        .faq-question::after {
+            content: '+';
+            font-size: 1.3rem;
+            color: var(--text-sub);
+            transition: transform 0.3s;
+        }
+        .faq-item.open .faq-question::after {
+            content: '−';
+            color: var(--accent-cyan);
+        }
+        .faq-answer {
+            color: var(--text-sub);
+            font-size: 0.9rem;
+            margin-top: 0;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.3s ease, opacity 0.3s ease, margin-top 0.3s ease;
+        }
+        .faq-item.open .faq-answer {
+            max-height: 200px;
+            opacity: 1;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-line);
+        }
+
+        /* Ticket Reference Card */
+        #ticketCard {
+            display: none;
+            background: rgba(0, 230, 118, 0.08);
+            border: 1px solid var(--accent-green);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 20px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        /* Toast Notification */
+        #toastContainer {
+            position: fixed;
+            bottom: 25px;
+            left: 25px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .toast {
+            background: var(--bg-card);
+            border: 1px solid var(--border-line);
+            color: #fff;
+            padding: 14px 20px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.9rem;
+            animation: slideIn 0.3s ease;
+        }
+        .toast.success { border-right: 4px solid var(--accent-green); }
+        .toast.error { border-right: 4px solid var(--danger-red); }
+
+        @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .page-wrapper { flex-direction: column; }
+            .sidebar { width: 100%; }
+        }
+    </style>
 </head>
 <body>
-<div id="site-header"></div>
 
-<section class="section">
-  <div class="container">
-    <div class="breadcrumb"><a href="index.html">الرئيسية</a> / تواصل معنا</div>
-    <div class="section-head"><span class="eyebrow">نسعد بخدمتك</span>
-      <h2>تواصل معنا</h2><p>فريقنا جاهز لمساعدتك على مدار الساعة. اختر الطريقة الأنسب لك.</p></div>
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="logo"><a href="index.html" style="font-size:1.5rem; font-weight:900; color:#fff; text-decoration:none;">الخزنة<span style="color:var(--accent-cyan);">الرقمية</span></a></div>
+            <ul class="sidebar-menu">
+                <li><a href="index.html">🏠 الصفحة الرئيسية</a></li>
+                <li><a href="shop.html">🛍️ تسوق الآن (المنتجات)</a></li>
+                <li><a href="contact.html" class="active">📩 تواصل معنا والأسئلة</a></li>
+                <li><a href="profile.html">🛒 سلة المشتريات / الملف</a></li>
+                <li><a href="checkout.html">💳 إتمام الدفع</a></li>
+                <li><a href="privacy.html">🔒 سياسة الخصوصية</a></li>
+            </ul>
+        </aside>
 
-    <div class="grid grid-3" style="margin-bottom:44px">
-      <div class="card feature"><div class="f-ico">📧</div><h3>البريد الإلكتروني</h3>
-        <p>support@raqmiyat.store</p><p style="color:var(--brand);font-weight:700">ردّ خلال 24 ساعة</p></div>
-      <div class="card feature"><div class="f-ico" style="background:linear-gradient(135deg,#10b981,#22c55e)">📱</div>
-        <h3>واتساب</h3><p dir="ltr">+966 55 000 0000</p><p style="color:var(--brand);font-weight:700">دعم فوري</p></div>
-      <div class="card feature"><div class="f-ico" style="background:linear-gradient(135deg,#f59e0b,#f97316)">📍</div>
-        <h3>العنوان</h3><p>الرياض، المملكة العربية السعودية</p><p style="color:var(--brand);font-weight:700">الأحد – الخميس</p></div>
+        <main class="main-content">
+            <h1 style="margin-bottom: 25px; font-size: 1.8rem;">الدعم الفني والتواصل 💬</h1>
+
+            <div id="ticketCard">
+                <h3 style="color: var(--accent-green); margin-bottom: 6px; font-size: 1rem;">✅ تم فتح تذكرة دعم برقم: <span id="displayTicketId" style="font-family: monospace;">---</span></h3>
+                <p style="font-size: 0.85rem; color: var(--text-sub);">احتفظ برقم التذكرة لمتابعة الرد من فريق الدعم عبر بريدك الإلكتروني.</p>
+            </div>
+
+            <div class="form-section">
+                <h2 style="margin-bottom: 15px; font-size: 1.3rem;">هل تواجه مشكلة أو ترغب في إبداء رأيك؟</h2>
+                <form id="contactForm">
+                    <div class="form-group">
+                        <label>نوع الطلب</label>
+                        <select id="requestType">
+                            <option value="feedback">⭐ تقييم الموقع وإبداء رأي</option>
+                            <option value="issue">⚠️ الإبلاغ عن مشكلة في الشراء/التحميل</option>
+                            <option value="inquiry">❓ استفسار عام</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>الاسم الكامل</label>
+                        <input type="text" id="contactName" placeholder="أدخل اسمك" required>
+                        <div class="error-msg" id="nameErr">يرجى كتابة الاسم الكامل (3 أحرف على الأقل)</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>البريد الإلكتروني</label>
+                        <input type="email" id="contactEmail" placeholder="example@mail.com" required>
+                        <div class="error-msg" id="emailErr">يرجى إدخال بريد إلكتروني صحيح</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>تفاصيل الرسالة</label>
+                        <textarea id="contactMessage" rows="5" placeholder="اكتب استفسارك أو رأيك بالتفصيل (10 أحرف على الأقل)..." required></textarea>
+                        <div class="error-msg" id="msgErr">يرجى كتابة تفاصيل واضحة (10 أحرف على الأقل)</div>
+                    </div>
+
+                    <button type="submit" class="btn-submit" id="submitBtn"><span>إرسال الطلب الآن 🚀</span></button>
+                </form>
+            </div>
+
+            <h2 style="margin-bottom: 15px; font-size: 1.3rem;">الأسئلة الشائعة ❓ <span style="font-size:0.8rem; font-weight:normal; color:var(--text-sub);">(اضغط على السؤال لعرض الإجابة)</span></h2>
+            
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">كيف أحصل على المنتج بعد الشراء؟</div>
+                <div class="faq-answer">يتم تسليم الكتب، مجسمات 3D/2D، والدورات مباشرة عبر روابط تحميل فورية تظهر في حسابك بعد إتمام الطلب وتفعيله.</div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">ما هي طرق الدفع المتاحة؟</div>
+                <div class="faq-answer">ندعم حالياً البطاقة الذهبية / BaridiMob، التحويل البريدي CCP، وبطاقات Visa / Mastercard العالمية.</div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">ماذا أفعل إذا واجهت مشكلة في فتح الملفات أو التحميل؟</div>
+                <div class="faq-answer">تأكد من وجود برنامج لفك الضغط (مثل WinRAR) وقارئ PDF، أو يمكنك التواصل معنا مباشرة من خلال النموذج أعلاه وسيتواصل معك الدعم الفني.</div>
+            </div>
+        </main>
     </div>
 
-    <div class="cart-layout">
-      <form class="prose" id="cForm" style="padding:28px">
-        <h2 style="margin-top:0">أرسل لنا رسالة</h2>
-        <div class="form-row">
-          <div class="form-group"><label>الاسم *</label><input name="name" required placeholder="اسمك الكامل"></div>
-          <div class="form-group"><label>البريد الإلكتروني *</label><input type="email" name="email" required placeholder="you@email.com"></div>
-        </div>
-        <div class="form-row">
-          <div class="form-group"><label>رقم الجوال</label><input name="phone" placeholder="+966 5X XXX XXXX"></div>
-          <div class="form-group"><label>الموضوع *</label>
-            <select name="subject"><option>استفسار عام</option><option>مشكلة في الدفع</option>
-              <option>مشكلة في التحميل</option><option>اقتراح / شكوى</option><option>الشراكة التجارية</option></select></div>
-        </div>
-        <div class="form-group"><label>الرسالة *</label>
-          <textarea name="msg" required placeholder="اكتب رسالتك بالتفصيل..."></textarea></div>
-        <button class="btn btn-primary btn-block">إرسال الرسالة ✉️</button>
-      </form>
+    <div id="toastContainer"></div>
 
-      <aside class="summary">
-        <h3>معلومات التواصل</h3>
-        <div class="acc-item open">
-          <div class="acc-q">🕐 ساعات العمل <span>−</span></div>
-          <div class="acc-a">الأحد – الخميس: 9ص – 6م<br>الجمعة – السبت: دعم طارئ فقط</div>
-        </div>
-        <div class="acc-item">
-          <div class="acc-q">⚡ متوسط زمن الرد <span>+</span></div>
-          <div class="acc-a">عادةً خلال ساعتين في أيام العمل، وخلال 24 ساعة كحد أقصى.</div>
-        </div>
-        <div class="acc-item">
-          <div class="acc-q">🌍 اللغات المدعومة <span>+</span></div>
-          <div class="acc-a">دعم باللغة العربية والإنجليزية.</div>
-        </div>
-        <div class="notice info" style="margin-top:18px">💬 هل تبحث عن إجابة سريعة؟ راجع
-          <a href="faq.html" style="color:var(--brand);font-weight:700">الأسئلة الشائعة</a>.</div>
-      </aside>
-    </div>
-  </div>
-</section>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-<div id="site-footer"></div>
-<script src="assets/js/app.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('cForm').addEventListener('submit', e=>{
-    e.preventDefault();
-    toast('تم استلام رسالتك، سنعاود التواصل قريباً ✓','success');
-    e.target.reset();
-  });
-  document.querySelectorAll('.acc-item').forEach(it=>{
-    it.querySelector('.acc-q').addEventListener('click', ()=>it.classList.toggle('open'));
-  });
-});
-</script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyClXL28rqPQr--pUu3N_Y-X3ihXEAKOyg8",
+            authDomain: "digivault-4c3a3.firebaseapp.com",
+            projectId: "digivault-4c3a3",
+            storageBucket: "digivault-4c3a3.firebasestorage.app",
+            messagingSenderId: "578335534171",
+            appId: "1:578335534171:web:1b108a849c0543f998a37e"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        window.toggleFaq = function(item) {
+            item.classList.toggle('open');
+        };
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById("toastContainer");
+            const toast = document.createElement("div");
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<span>${type === 'success' ? '✅' : '❌'}</span><span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = '0.3s';
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        onAuthStateChanged(auth, (user) => {
+            if (user && user.email) {
+                document.getElementById('contactEmail').value = user.email;
+                if (user.displayName) document.getElementById('contactName').value = user.displayName;
+            } else {
+                const localProfile = JSON.parse(localStorage.getItem("userProfile"));
+                if (localProfile) {
+                    if (localProfile.email) document.getElementById('contactEmail').value = localProfile.email;
+                    if (localProfile.name) document.getElementById('contactName').value = localProfile.name;
+                }
+            }
+        });
+
+        function validateForm() {
+            let isValid = true;
+            document.querySelectorAll('.error-msg').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('input, textarea').forEach(el => el.classList.remove('invalid'));
+
+            const name = document.getElementById('contactName').value.trim();
+            const email = document.getElementById('contactEmail').value.trim();
+            const message = document.getElementById('contactMessage').value.trim();
+
+            if (name.length < 3) {
+                document.getElementById('contactName').classList.add('invalid');
+                document.getElementById('nameErr').style.display = 'block';
+                isValid = false;
+            }
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                document.getElementById('contactEmail').classList.add('invalid');
+                document.getElementById('emailErr').style.display = 'block';
+                isValid = false;
+            }
+            if (message.length < 10) {
+                document.getElementById('contactMessage').classList.add('invalid');
+                document.getElementById('msgErr').style.display = 'block';
+                isValid = false;
+            }
+            return isValid;
+        }
+
+        document.getElementById("contactForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+
+            if (!validateForm()) {
+                showToast("يرجى تصحيح الأخطاء قبل الإرسال", "error");
+                return;
+            }
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<span>جاري الإرسال... ⏳</span>`;
+
+            const ticketId = "SUP-" + Math.floor(100000 + Math.random() * 900000);
+
+            const formData = {
+                ticketId: ticketId,
+                requestType: document.getElementById('requestType').value,
+                name: document.getElementById('contactName').value.trim(),
+                email: document.getElementById('contactEmail').value.trim(),
+                message: document.getElementById('contactMessage').value.trim(),
+                status: 'pending',
+                adminReply: '',
+                createdAt: serverTimestamp()
+            };
+
+            try {
+                await addDoc(collection(db, "contact_messages"), formData);
+                document.getElementById("displayTicketId").innerText = ticketId;
+                document.getElementById("ticketCard").style.display = "block";
+                showToast("تم إرسال رسالتك وتوليد تذكرة دعم بنجاح!");
+                this.reset();
+            } catch (error) {
+                console.error("خطأ في إرسال الرسالة:", error);
+                showToast("حدث خطأ أثناء الإرسال، تحقق من الاتصال أو القواعد.", "error");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `<span>إرسال الطلب الآن 🚀</span>`;
+            }
+        });
+    </script>
+    <script type="module" src="./site-enhance.js"></script>
 </body>
 </html>

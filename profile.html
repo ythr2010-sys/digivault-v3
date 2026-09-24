@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مشترياتي وملفاتي | الخزنة الرقمية</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-main:#0a0a12; --bg-card:#141424; --accent-cyan:#00d2ff; --border-line:rgba(255,255,255,.08); --text-main:#fff; --text-sub:#a0a0c0; --danger-red:#ff4757; }
+        * { box-sizing:border-box; margin:0; padding:0; }
+        body { font-family:'Tajawal',sans-serif; background:var(--bg-main); color:var(--text-main); line-height:1.8; min-height:100vh; display:flex; flex-direction:column; }
+        .navbar { display:flex; justify-content:space-between; align-items:center; padding:18px 8%; background:var(--bg-card); border-bottom:1px solid var(--border-line); position:sticky; top:0; z-index:100; }
+        .logo a { font-size:1.5rem; font-weight:800; color:var(--text-main); text-decoration:none; }
+        .logo a span { color:var(--accent-cyan); }
+        .nav-link { color:var(--accent-cyan); text-decoration:none; font-weight:500; }
+        .main-wrapper { flex:1; padding:40px 20px; display:flex; justify-content:center; }
+        .container { width:100%; max-width:820px; background:var(--bg-card); border:1px solid var(--border-line); border-radius:16px; padding:35px 30px; box-shadow:0 10px 30px rgba(0,0,0,.5); height:fit-content; }
+        .container h2 { font-size:1.6rem; font-weight:800; margin-bottom:25px; border-right:4px solid var(--accent-cyan); padding-right:12px; }
+        .orders-list { display:flex; flex-direction:column; gap:15px; }
+        .order-card { border:1px solid var(--border-line); border-radius:12px; padding:20px; }
+        .order-head { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid var(--border-line); }
+        .badge-status { display:inline-block; padding:3px 10px; border-radius:6px; font-size:.78rem; font-weight:700; background:rgba(255,171,0,.15); color:#ffab00; }
+        .badge-status.done { background:rgba(0,230,118,.12); color:#00e676; }
+        .order-item-row { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:10px 0; flex-wrap:wrap; }
+        .order-item-row strong { font-size:1rem; }
+        .order-meta { font-size:.82rem; color:var(--text-sub); }
+        .btn-download { background:linear-gradient(135deg,var(--accent-cyan),#8a2be2); color:#fff; padding:9px 20px; border-radius:8px; text-decoration:none; font-size:.9rem; font-weight:700; }
+        .status-message { text-align:center; padding:30px; color:var(--text-sub); font-size:.95rem; }
+        footer { text-align:center; padding:25px; border-top:1px solid var(--border-line); color:var(--text-sub); font-size:.9rem; background:var(--bg-card); }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="logo"><a href="index.html">الخزنة <span>الرقمية</span></a></div>
+        <div style="display:flex;gap:18px;">
+            <a href="cart.html" class="nav-link">🛒 السلة</a>
+            <a href="index.html" class="nav-link">الرئيسية</a>
+        </div>
+    </header>
+    <div class="main-wrapper">
+        <div class="container">
+            <h2>📦 مشترياتي وملفاتي الرقمية</h2>
+            <div id="myPurchasesList" class="status-message">جاري تحميل المشتريات...</div>
+        </div>
+    </div>
+    <footer><p>جميع الحقوق محفوظة © 2026 الخزنة الرقمية (DigiVault)</p></footer>
+    <script type="module">
+        import { auth, db, esc } from "./firebase-init.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        onAuthStateChanged(auth, (user) => {
+            if (user && user.email) loadPurchasesFromFirebase(user.email);
+            else document.getElementById("myPurchasesList").innerHTML = `
+                <div style="text-align:center;padding:20px;">
+                    <p style="margin-bottom:15px;">قم بتسجيل الدخول لعرض مشترياتك وملفاتك الرقمية.</p>
+                    <a href="login.html" class="btn-download" style="display:inline-flex;">تسجيل الدخول</a>
+                </div>`;
+        });
+
+        async function loadPurchasesFromFirebase(buyerEmail) {
+            const container = document.getElementById("myPurchasesList");
+            try {
+                const q = query(collection(db, "orders"), where("buyerEmail", "==", buyerEmail));
+                const snap = await getDocs(q);
+                if (snap.empty) {
+                    container.innerHTML = "<p>لا توجد طلبات سابقة لهذا الحساب حتى الآن.</p>";
+                    return;
+                }
+                let html = '<div class="orders-list">';
+                snap.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    const items = data.items || [];
+                    const status = data.status || 'pending';
+                    const isCompleted = status === 'completed';
+                    const dateStr = data.createdAt && data.createdAt.toDate ? data.createdAt.toDate().toLocaleDateString('ar-DZ') : '';
+                    html += `<div class="order-card">
+                        <div class="order-head">
+                            <div>
+                                <strong>طلب #${esc(docSnap.id.slice(0, 6))}</strong>
+                                <div class="order-meta">${esc(dateStr)} • ${esc(data.paymentMethod || '')} • المجموع: ${esc(data.totalAmount || '0')} $</div>
+                            </div>
+                            <span class="badge-status ${isCompleted ? 'done' : ''}">${isCompleted ? 'مكتمل ✅' : 'قيد المراجعة ⏳'}</span>
+                        </div>`;
+                    const links = data.deliveryLinks || [];
+                    items.forEach(item => {
+                        const itemName = item.title || item.name || 'منتج رقمي';
+                        const linkObj = links.find(l => l.productId === item.id) || null;
+                        html += `<div class="order-item-row">
+                            <div><strong>${esc(itemName)}</strong></div>
+                            ${isCompleted && linkObj && linkObj.url
+                                ? `<a href="${esc(linkObj.url)}" target="_blank" rel="noopener noreferrer" class="btn-download">تنزيل الملف 📥</a>`
+                                : `<span style="color:var(--text-sub);font-size:.85rem;">${isCompleted ? 'التسليم جاري من الإدارة' : 'بانتظار تأكيد الدفع'}</span>`}
+                        </div>`;
+                    });
+                    html += '</div>';
+                });
+                html += '</div>';
+                container.className = "";
+                container.innerHTML = html;
+            } catch (err) {
+                console.error(err);
+                container.innerHTML = "<p style='color:var(--danger-red);'>تعذر تحميل الطلبات، تحقق من الاتصال بالإنترنت.</p>";
+            }
+        }
+    </script>
+    <script type="module" src="./site-enhance.js"></script>
+</body>
+</html>

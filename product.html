@@ -1,105 +1,354 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" data-theme="light">
+<html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>تفاصيل المنتج | رقميّات ستور</title>
-<meta name="description" content="تفاصيل المنتج الرقمي: الوصف، المميزات، المحتويات وتقييمات العملاء.">
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منتج | الخزنة الرقمية</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-main:#0a0a12; --bg-card:#141424; --accent-cyan:#00d2ff; --accent-purple:#8a2be2; --accent-green:#00e676; --danger-red:#ff4757; --warning:#ffa502; --border-line:rgba(255,255,255,.08); --text-main:#fff; --text-sub:#a0a0c0; }
+        * { box-sizing:border-box; margin:0; padding:0; }
+        body { font-family:'Tajawal',sans-serif; background:var(--bg-main); color:var(--text-main); line-height:1.7; }
+        .navbar { display:flex; justify-content:space-between; align-items:center; padding:16px 6%; background:var(--bg-card); border-bottom:1px solid var(--border-line); position:sticky; top:0; z-index:100; flex-wrap:wrap; gap:10px; }
+        .logo a { font-size:1.4rem; font-weight:900; color:#fff; text-decoration:none; }
+        .logo a span { color:var(--accent-cyan); }
+        .nav-links { display:flex; gap:16px; flex-wrap:wrap; }
+        .nav-links a { color:var(--text-sub); text-decoration:none; font-weight:600; font-size:.9rem; }
+        .nav-links a:hover { color:var(--accent-cyan); }
+        .main { max-width:1050px; margin:35px auto; padding:0 20px; }
+        .product-layout { display:grid; grid-template-columns:1.05fr .95fr; gap:30px; margin-bottom:40px; }
+        .gallery-main { width:100%; height:340px; object-fit:cover; border-radius:14px; border:1px solid var(--border-line); background:#1e1e24; }
+        .gallery-thumbs { display:flex; gap:10px; margin-top:10px; flex-wrap:wrap; }
+        .gallery-thumbs img { width:72px; height:54px; object-fit:cover; border-radius:8px; cursor:pointer; border:2px solid transparent; opacity:.7; transition:.2s; }
+        .gallery-thumbs img:hover, .gallery-thumbs img.active { border-color:var(--accent-cyan); opacity:1; }
+        .badge-cat { display:inline-block; background:rgba(138,43,226,.18); color:#c084fc; padding:4px 14px; border-radius:8px; font-size:.78rem; font-weight:800; margin-bottom:12px; }
+        h1.product-title { font-size:1.9rem; font-weight:900; margin-bottom:10px; }
+        .price-big { font-size:2rem; font-weight:900; color:var(--accent-green); margin:14px 0; }
+        .desc-box { background:var(--bg-card); border:1px solid var(--border-line); border-radius:12px; padding:20px; color:var(--text-sub); white-space:pre-wrap; }
+        .btn-add-big { display:block; width:100%; margin-top:18px; background:linear-gradient(135deg,var(--accent-cyan),var(--accent-purple)); color:#fff; border:none; padding:15px; border-radius:10px; font-weight:800; font-size:1.1rem; cursor:pointer; font-family:inherit; }
+        .btn-add-big:hover { opacity:.9; transform:translateY(-2px); }
+        /* التقييم */
+        .stars { font-size:1.6rem; letter-spacing:4px; cursor:pointer; user-select:none; }
+        .stars .lit { color:var(--warning); }
+        .stars .dim, .stars-static .dim { color:#3a3a4e; }
+        .stars-static { font-size:1.2rem; letter-spacing:3px; }
+        .stars-static .lit { color:var(--warning); }
+        .rating-summary { display:flex; align-items:center; gap:14px; margin:8px 0 14px; }
+        .card-section { background:var(--bg-card); border:1px solid var(--border-line); border-radius:14px; padding:25px; margin-bottom:25px; }
+        .card-section h2 { font-size:1.25rem; margin-bottom:18px; border-right:4px solid var(--accent-cyan); padding-right:12px; }
+        /* التعليقات */
+        .comment { border-bottom:1px solid var(--border-line); padding:16px 0; }
+        .comment:last-child { border-bottom:none; }
+        .comment-head { display:flex; align-items:center; gap:10px; margin-bottom:6px; }
+        .comment-avatar { width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,var(--accent-cyan),var(--accent-purple)); display:flex; align-items:center; justify-content:center; font-weight:900; color:#fff; }
+        .comment-author { font-weight:800; font-size:.95rem; }
+        .comment-time { font-size:.75rem; color:var(--text-sub); }
+        .comment-text { color:#d5d5e8; font-size:.93rem; margin-top:4px; }
+        .seller-reply { background:rgba(0,210,255,.05); border-right:3px solid var(--accent-cyan); border-radius:8px; padding:12px 14px; margin-top:10px; margin-right:20px; }
+        .seller-reply .tag { color:var(--accent-cyan); font-size:.75rem; font-weight:800; margin-bottom:4px; }
+        .comment-form textarea { width:100%; background:#0a0a12; border:1px solid var(--border-line); border-radius:10px; padding:12px; color:#fff; font-family:inherit; font-size:.95rem; min-height:90px; resize:vertical; }
+        .comment-form textarea:focus { border-color:var(--accent-cyan); outline:none; }
+        .btn-submit-small { background:linear-gradient(135deg,var(--accent-cyan),var(--accent-purple)); color:#fff; border:none; padding:11px 26px; border-radius:8px; font-weight:800; cursor:pointer; font-family:inherit; margin-top:10px; }
+        .reply-form textarea { width:100%; background:#0a0a12; border:1px solid var(--border-line); border-radius:8px; padding:9px; color:#fff; font-family:inherit; font-size:.85rem; margin-top:8px; }
+        .btn-reply { background:rgba(0,210,255,.12); color:var(--accent-cyan); border:1px solid var(--accent-cyan); padding:6px 14px; border-radius:6px; font-size:.78rem; font-weight:700; cursor:pointer; font-family:inherit; margin-top:8px; }
+        .login-hint { color:var(--text-sub); font-size:.88rem; text-align:center; padding:14px; }
+        .login-hint a { color:var(--accent-cyan); font-weight:800; text-decoration:none; }
+        .review-item { padding:10px 0; border-bottom:1px solid var(--border-line); font-size:.9rem; }
+        .review-item:last-child { border-bottom:none; }
+        #toastContainer { position:fixed; bottom:25px; left:25px; z-index:9999; }
+        .toast { background:var(--bg-card); border:1px solid var(--border-line); color:#fff; padding:14px 20px; border-radius:10px; box-shadow:0 10px 30px rgba(0,0,0,.5); font-size:.9rem; border-right:4px solid var(--accent-green); }
+        @media (max-width:850px){ .product-layout{grid-template-columns:1fr} .gallery-main{height:240px} }
+    </style>
+
 </head>
 <body>
-<div id="site-header"></div>
-
-<section class="section">
-  <div class="container">
-    <div class="breadcrumb"><a href="index.html">الرئيسية</a> / <a href="store.html">المتجر</a> / <span id="crumb">المنتج</span></div>
-    <div id="productHost"></div>
-
-    <div class="tabs">
-      <div class="tab active" data-t="desc">الوصف</div>
-      <div class="tab" data-t="inc">ماذا ستحصل عليه</div>
-      <div class="tab" data-t="rev">التقييمات</div>
-    </div>
-    <div class="prose" id="tabBody"></div>
-
-    <div class="section-head" style="margin:60px 0 30px"><h2>منتجات مشابهة</h2></div>
-    <div class="grid grid-4" id="related"></div>
-  </div>
-</section>
-
-<div id="site-footer"></div>
-<script src="assets/js/app.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const id = new URLSearchParams(location.search).get('id');
-  const p = getProduct(id) || getProducts()[0];
-  document.getElementById('crumb').textContent = p.title;
-  document.title = p.title + ' | رقميّات ستور';
-
-  const sale = p.old && p.old > p.price;
-  const off = sale ? Math.round((1-p.price/p.old)*100) : 0;
-
-  document.getElementById('productHost').innerHTML = `
-    <div class="product-hero">
-      <div class="product-visual" style="background:${p.img}">
-        <span>${p.icon||'📦'}</span>
-      </div>
-      <div>
-        <span class="eyebrow">${p.cat}</span>
-        <h1 style="font-size:clamp(24px,3vw,36px);font-weight:800;margin-bottom:12px">${p.title}</h1>
-        <div class="p-meta" style="font-size:15px">
-          <span class="stars">${stars(p.rating)}</span><span>${p.rating}</span>
-          <span>·</span><span>${p.sales} مبيع</span><span>·</span><span>متوفر ✓</span>
+    <header class="navbar">
+        <div class="logo"><a href="index.html">الخزنة<span>الرقمية</span></a></div>
+        <div class="nav-links">
+            <a href="shop.html">🛍️ المتجر</a>
+            <a href="cart.html">🛒 السلة</a>
+            <a href="add-product.html">➕ بيع معنا</a>
         </div>
-        <p style="color:var(--muted);margin:16px 0 20px">${p.desc}</p>
-        <div class="p-price">
-          <b style="font-size:32px">${money(p.price)}</b>
-          ${sale?`<s>${money(p.old)}</s><span class="p-sale" style="position:static">وفّر ${off}%</span>`:''}
-        </div>
-        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px">
-          <button class="btn btn-primary" onclick="addToCart('${p.id}');setTimeout(()=>location.href='cart.html',700)">اشترِ الآن ←</button>
-          <button class="btn btn-outline" onclick="addToCart('${p.id}')">أضف إلى السلة 🛒</button>
-        </div>
-        <div class="notice info">
-          ⚡ <b>تسليم فوري:</b> يصل رابط التحميل إلى بريدك مباشرة بعد إتمام الدفع. ترخيص مدى الحياة لاستخدام شخصي وتجاري.
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px">
-          <div class="kpi"><b>♾️</b><span>ترخيص دائم</span></div>
-          <div class="kpi"><b>🔄</b><span>تحديثات مجانية</span></div>
-          <div class="kpi"><b>💬</b><span>دعم 24/7</span></div>
-        </div>
-      </div>
-    </div>`;
+    </header>
 
-  const tabs = {
-    desc: `<h2>وصف المنتج</h2><p>${p.desc}</p>
-           <p>منتج رقمي عالي الجودة صُمّم بعناية ليوفّر عليك الوقت والجهد. يأتي جاهزاً للاستخدام مباشرة مع ملفات مصدرية قابلة للتعديل بالكامل.</p>
-           <h2>المواصفات</h2>
-           <ul><li>الفئة: ${p.cat}</li><li>صيغة التسليم: ملفات رقمية قابلة للتحميل</li>
-           <li>الترخيص: استخدام شخصي وتجاري</li><li>التحديثات: مجانية مدى الحياة</li></ul>`,
-    inc: `<h2>ماذا ستحصل عليه؟</h2>
-          <ul><li>ملف المنتج الرئيسي بصيغة عالية الجودة</li>
-          <li>ملفات مصدرية قابلة للتعديل</li>
-          <li>دليل استخدام بالعربية خطوة بخطوة</li>
-          <li>وصول دائم لصفحة التحميل والتحديثات</li>
-          <li>دعم فني مباشر من فريقنا</li></ul>
-          <div class="notice warn">💡 جميع الملفات تُسلّم رقمياً؛ لا يوجد شحن فيزيائي.</div>`,
-    rev: `<h2>تقييمات العملاء</h2>
-      ${[['أحمد العتيبي',5,'جودة ممتازة وفوق التوقعات، أنصح به بشدة.'],['سارة منصور',5,'استفدت منه كثيراً في مشروعي الأخير. خدمة عملاء سريعة.'],['خالد الحربي',4,'منتج جيد جداً، فقط كنت أتمنى شرحاً أطول قليلاً.']]
-        .map(([n,r,t])=>`<div style="border-bottom:1px solid var(--border);padding:16px 0">
-          <b>${n}</b> <span class="stars">${stars(r)}</span><p style="margin-top:6px">"${t}"</p></div>`).join('')}`
-  };
-  const body = document.getElementById('tabBody');
-  function setTab(k){ body.innerHTML = tabs[k];
-    document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.t===k)) }
-  document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>setTab(t.dataset.t)));
-  setTab('desc');
+    <div class="main" id="productMain"><p style="text-align:center;color:var(--text-sub);padding:50px;">جاري تحميل المنتج...</p></div>
+    <div id="toastContainer"></div>
 
-  const rel = getProducts().filter(x=>x.id!==p.id && x.cat===p.cat).slice(0,4);
-  const fill = rel.length ? rel : getProducts().filter(x=>x.id!==p.id).slice(0,4);
-  document.getElementById('related').innerHTML = fill.map(productCard).join('');
-});
-</script>
+    <script type="module">
+        import { auth, db, checkIsAdmin, getCart, saveCart, esc } from "./firebase-init.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { collection, doc, getDoc, getDocs, addDoc, updateDoc, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const productId = new URLSearchParams(window.location.search).get('id');
+        const main = document.getElementById('productMain');
+        let currentUser = null;
+        let isAdmin = false;
+        let product = null;
+        let hasPurchased = false;
+        let myRating = 0;
+
+        function showToast(msg) {
+            const t = document.createElement('div');
+            t.className = 'toast';
+            t.textContent = '✅ ' + msg;
+            document.getElementById('toastContainer').appendChild(t);
+            setTimeout(() => t.remove(), 3000);
+        }
+
+        if (!productId) {
+            main.innerHTML = '<p style="text-align:center;padding:50px;color:var(--danger-red);">⚠️ لم يتم تحديد منتج.</p>';
+            throw new Error('no id');
+        }
+
+        async function loadAll() {
+            // 1) المنتج
+            const snap = await getDoc(doc(db, "products", productId));
+            if (!snap.exists()) {
+                main.innerHTML = '<p style="text-align:center;padding:50px;color:var(--danger-red);">⚠️ هذا المنتج غير موجود أو تم حذفه.</p>';
+                return;
+            }
+            product = { id: snap.id, ...snap.data() };
+            document.title = product.title + " | الخزنة الرقمية";
+
+            // السماح للبائع/الأدمن برؤية منتج غير معتمد
+            const viewerEmail = currentUser?.email?.toLowerCase();
+            const isOwner = viewerEmail && product.sellerEmail?.toLowerCase() === viewerEmail;
+            if (product.status !== 'approved' && !isOwner && !isAdmin) {
+                main.innerHTML = '<p style="text-align:center;padding:50px;color:var(--text-sub);">هذا المنتج غير متوفر حالياً.</p>';
+                return;
+            }
+
+            // 2) هل اشترى المستخدم هذا المنتج؟ (للتقييم)
+            hasPurchased = false;
+            if (currentUser?.email) {
+                const ordersSnap = await getDocs(query(collection(db, "orders"), where("buyerEmail", "==", currentUser.email)));
+                ordersSnap.forEach(d => {
+                    const o = d.data();
+                    if (o.status === 'completed' && (o.items || []).some(i => i.id === productId)) hasPurchased = true;
+                });
+            }
+
+            render();
+            loadReviews();
+            loadComments();
+        }
+
+        function priceFormatted() {
+            const p = String(product.price || '');
+            return p.includes('$') || p === 'مجاني' ? p : '$' + p;
+        }
+
+        function render() {
+            const catLabels = { books: '📚 كتب وروايات', models: '🎨 مجسمات 3D/2D', courses: '🎓 دورات تعليمية', gaming: '🎮 ألعاب واشتراكات' };
+            const promoImages = product.promoImages || [];
+            const allImages = [product.imageUrl, ...promoImages].filter(Boolean);
+
+            main.innerHTML = `
+                <div class="product-layout">
+                    <div>
+                        <img class="gallery-main" id="galleryMain" src="${esc(product.imageUrl || '')}" alt="${esc(product.title)}" onerror="this.src='https://via.placeholder.com/600x340?text=DigiVault'">
+                        ${allImages.length > 1 ? `<div class="gallery-thumbs" id="galleryThumbs">
+                            ${allImages.map((img, i) => `<img src="${esc(img)}" data-src="${esc(img)}" class="${i === 0 ? 'active' : ''}" onerror="this.remove()">`).join('')}
+                        </div>` : ''}
+                    </div>
+                    <div>
+                        <span class="badge-cat">${catLabels[product.category] || esc(product.category)}</span>
+                        <h1 class="product-title">${esc(product.title)}</h1>
+                        <div class="rating-summary">
+                            <span class="stars-static" id="avgStars"></span>
+                            <span style="color:var(--text-sub);font-size:.9rem;" id="avgText"></span>
+                        </div>
+                        <div class="price-big">${esc(priceFormatted())}</div>
+                        <div class="desc-box">${esc(product.description || 'لا يوجد وصف.')}</div>
+                        <button class="btn-add-big" id="addToCartBtn">أضف إلى السلة 🛒</button>
+                    </div>
+                </div>
+
+                <div class="card-section">
+                    <h2>⭐ تقييم المنتج</h2>
+                    <div id="ratingArea"></div>
+                </div>
+
+                <div class="card-section">
+                    <h2>💬 التعليقات والأسئلة</h2>
+                    <div id="commentsList"><p style="color:var(--text-sub);font-size:.88rem;">جاري تحميل التعليقات...</p></div>
+                    <div id="commentFormArea" style="margin-top:20px;"></div>
+                </div>`;
+
+            // المعرض
+            document.querySelectorAll('#galleryThumbs img').forEach(img => {
+                img.addEventListener('click', () => {
+                    document.querySelectorAll('#galleryThumbs img').forEach(i => i.classList.remove('active'));
+                    img.classList.add('active');
+                    document.getElementById('galleryMain').src = img.dataset.src;
+                });
+            });
+
+            // إضافة للسلة
+            document.getElementById('addToCartBtn').addEventListener('click', () => {
+                const cart = getCart();
+                cart.push({ id: product.id, title: product.title, price: product.price });
+                saveCart(cart);
+                showToast(`تمت إضافة "${product.title}" إلى السلة`);
+            });
+        }
+
+        // ============ التقييم بالنجوم ============
+        async function loadReviews() {
+            const snap = await getDocs(query(collection(db, "reviews"), where("productId", "==", productId)));
+            const reviews = [];
+            snap.forEach(d => reviews.push(d.data()));
+
+            const avg = reviews.length ? reviews.reduce((s, r) => s + (r.rating || 0), 0) / reviews.length : 0;
+
+            const avgStars = document.getElementById('avgStars');
+            avgStars.innerHTML = [1,2,3,4,5].map(i => `<span class="${i <= Math.round(avg) ? 'lit' : 'dim'}">★</span>`).join('');
+            document.getElementById('avgText').textContent = avg > 0
+                ? `${avg.toFixed(1)} من 5 (${reviews.length} تقييم)`
+                : 'لا توجد تقييمات بعد';
+
+            const area = document.getElementById('ratingArea');
+            if (!currentUser) {
+                area.innerHTML = `<div class="login-hint">سجّل <a href="login.html">الدخول</a> لتتمكن من تقييم المنتج.</div>`;
+                return;
+            }
+            if (!hasPurchased) {
+                area.innerHTML = `<p style="color:var(--text-sub);font-size:.9rem;">⭐ يمكن فقط للمشترين تقييم هذا المنتج.</p>
+                    ${reviews.map(r => `<div class="review-item">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)} — <strong>${esc(r.userName)}</strong></div>`).join('')}`;
+                return;
+            }
+
+            myRating = reviews.find(r => r.userEmail === currentUser.email)?.rating || 0;
+
+            area.innerHTML = `
+                <p style="margin-bottom:8px;font-size:.9rem;color:var(--text-sub);">قيّم تجربتك مع هذا المنتج:</p>
+                <div class="stars" id="starInput">
+                    ${[1,2,3,4,5].map(i => `<span data-val="${i}" class="${i <= myRating ? 'lit' : 'dim'}">★</span>`).join('')}
+                </div>
+                <div id="ratingMsg" style="font-size:.82rem;color:var(--accent-green);margin-top:6px;min-height:18px;"></div>
+                ${reviews.map(r => `<div class="review-item">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)} — <strong>${esc(r.userName)}</strong></div>`).join('')}`;
+
+            document.querySelectorAll('#starInput span').forEach(star => {
+                star.addEventListener('click', async () => {
+                    const val = parseInt(star.dataset.val);
+                    try {
+                        // هل له تقييم سابق؟ (قاعدة بيانات بسيطة بالبريد+المنتج)
+                        const oldSnap = await getDocs(query(collection(db, "reviews"),
+                            where("productId", "==", productId)));
+                        let existing = null;
+                        oldSnap.forEach(d => { if (d.data().userEmail === currentUser.email) existing = d; });
+
+                        if (existing) {
+                            await updateDoc(doc(db, "reviews", existing.id), { rating: val });
+                        } else {
+                            await addDoc(collection(db, "reviews"), {
+                                productId,
+                                userEmail: currentUser.email,
+                                userName: currentUser.displayName || currentUser.email.split('@')[0],
+                                rating: val,
+                                createdAt: serverTimestamp()
+                            });
+                        }
+                        document.getElementById('ratingMsg').textContent = 'شكراً! تم حفظ تقييمك ⭐';
+                        loadReviews();
+                    } catch (e) {
+                        document.getElementById('ratingMsg').textContent = 'خطأ: ' + e.message;
+                        document.getElementById('ratingMsg').style.color = 'var(--danger-red)';
+                    }
+                });
+            });
+        }
+
+        // ============ التعليقات ============
+        async function loadComments() {
+            const snap = await getDocs(query(collection(db, "comments"), where("productId", "==", productId)));
+            const comments = [];
+            snap.forEach(d => comments.push({ id: d.id, ...d.data() }));
+            comments.sort((a, b) => (a.createdAt?.toMillis?.() || 0) - (b.createdAt?.toMillis?.() || 0));
+
+            const list = document.getElementById('commentsList');
+            if (comments.length === 0) {
+                list.innerHTML = '<p style="color:var(--text-sub);font-size:.88rem;">لا توجد تعليقات بعد - كن أول من يعلق! 👇</p>';
+            } else {
+                const isSeller = currentUser?.email?.toLowerCase() === product.sellerEmail?.toLowerCase();
+                list.innerHTML = comments.map(c => `
+                    <div class="comment">
+                        <div class="comment-head">
+                            <div class="comment-avatar">${esc((c.userName || 'م')[0])}</div>
+                            <div>
+                                <div class="comment-author">${esc(c.userName)}</div>
+                                <div class="comment-time">${c.createdAt?.toDate ? c.createdAt.toDate().toLocaleString('ar-DZ') : ''}</div>
+                            </div>
+                        </div>
+                        <div class="comment-text">${esc(c.text)}</div>
+                        ${c.reply ? `<div class="seller-reply"><div class="tag">🏷️ رد البائع</div><div>${esc(c.reply.text)}</div><div class="comment-time">${c.reply.createdAt?.toDate ? c.reply.createdAt.toDate().toLocaleString('ar-DZ') : ''}</div></div>` : ''}
+                        ${(isSeller || isAdmin) && !c.reply ? `
+                            <button class="btn-reply" data-reply-to="${c.id}">↩️ الرد كبائع</button>
+                            <div class="reply-form" id="replyForm-${c.id}" style="display:none;">
+                                <textarea rows="2" placeholder="اكتب ردك..."></textarea>
+                                <button class="btn-submit-small" data-send-reply="${c.id}">إرسال الرد</button>
+                            </div>` : ''}
+                    </div>`).join('');
+
+                list.querySelectorAll('[data-reply-to]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        document.getElementById('replyForm-' + btn.dataset.replyTo).style.display = 'block';
+                        btn.style.display = 'none';
+                    });
+                });
+                list.querySelectorAll('[data-send-reply]').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        const commentId = btn.dataset.sendReply;
+                        const textarea = document.getElementById('replyForm-' + commentId).querySelector('textarea');
+                        const text = textarea.value.trim();
+                        if (!text) return;
+                        try {
+                            await updateDoc(doc(db, "comments", commentId), {
+                                reply: { text, createdAt: new Date() }
+                            });
+                            loadComments();
+                        } catch (e) { alert('خطأ: ' + e.message); }
+                    });
+                });
+            }
+
+            // نموذج إضافة تعليق
+            const formArea = document.getElementById('commentFormArea');
+            if (!currentUser) {
+                formArea.innerHTML = `<div class="login-hint">سجّل <a href="login.html">الدخول</a> لإضافة تعليق أو سؤال.</div>`;
+            } else {
+                formArea.innerHTML = `
+                    <form class="comment-form" id="commentForm">
+                        <textarea id="commentText" placeholder="اكتب تعليقاً أو سؤالاً عن المنتج..." required></textarea>
+                        <button type="submit" class="btn-submit-small">نشر التعليق 💬</button>
+                    </form>`;
+                document.getElementById('commentForm').addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const text = document.getElementById('commentText').value.trim();
+                    if (text.length < 2) return;
+                    try {
+                        await addDoc(collection(db, "comments"), {
+                            productId,
+                            userEmail: currentUser.email,
+                            userName: currentUser.displayName || currentUser.email.split('@')[0],
+                            text,
+                            reply: null,
+                            createdAt: serverTimestamp()
+                        });
+                        showToast('تم نشر تعليقك 💬');
+                        loadComments();
+                    } catch (err) { alert('خطأ: ' + err.message); }
+                });
+            }
+        }
+
+        onAuthStateChanged(auth, async (user) => {
+            currentUser = user;
+            isAdmin = user ? await checkIsAdmin(user) : false;
+            loadAll();
+        });
+    </script>
+    <script type="module" src="./site-enhance.js"></script>
 </body>
 </html>

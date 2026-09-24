@@ -1,65 +1,81 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" data-theme="light">
+<html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>سياسة الخصوصية | رقميّات ستور</title>
-<meta name="description" content="سياسة الخصوصية وحماية البيانات في رقميّات ستور.">
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سياسة الخصوصية | الخزنة الرقمية</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-main:#0a0a12; --bg-card:#141424; --accent-cyan:#00d2ff; --border-line:rgba(255,255,255,.08); --text-main:#ffffff; --text-sub:#a0a0c0; }
+        * { box-sizing:border-box; margin:0; padding:0; }
+        body { font-family:'Tajawal',sans-serif; background:var(--bg-main); color:var(--text-main); line-height:1.8; min-height:100vh; display:flex; flex-direction:column; }
+        .navbar { display:flex; justify-content:space-between; align-items:center; padding:18px 8%; background:var(--bg-card); border-bottom:1px solid var(--border-line); position:sticky; top:0; z-index:100; }
+        .logo a { font-size:1.5rem; font-weight:800; color:var(--text-main); text-decoration:none; }
+        .logo a span { color:var(--accent-cyan); }
+        .nav-link { color:var(--accent-cyan); text-decoration:none; font-weight:500; font-size:.95rem; transition:opacity .2s; }
+        .nav-link:hover { opacity:.8; }
+        .container { max-width:860px; width:90%; margin:40px auto; padding:40px; background:var(--bg-card); border-radius:16px; border:1px solid var(--border-line); box-shadow:0 10px 30px rgba(0,0,0,.5); flex:1; }
+        .update-badge { display:inline-block; background:rgba(0,210,255,.1); color:var(--accent-cyan); padding:4px 12px; border-radius:20px; font-size:.85rem; font-weight:500; margin-bottom:20px; }
+        h1 { color:var(--text-main); margin-bottom:15px; font-size:2.3rem; font-weight:800; }
+        .intro-text { color:var(--text-sub); font-size:1.05rem; margin-bottom:35px; padding-bottom:20px; border-bottom:1px solid var(--border-line); }
+        h2 { color:var(--text-main); margin-top:35px; margin-bottom:15px; font-size:1.35rem; border-right:4px solid var(--accent-cyan); padding-right:12px; }
+        p, li { color:var(--text-sub); font-size:.98rem; }
+        ul { padding-right:22px; margin-top:10px; }
+        li { margin-bottom:10px; }
+        strong { color:var(--text-main); }
+        a.legal-link { color:var(--accent-cyan); text-decoration:none; font-weight:500; }
+        a.legal-link:hover { text-decoration:underline; }
+        .contact-box { background:rgba(255,255,255,.02); border:1px solid var(--border-line); border-radius:10px; padding:16px 20px; margin-top:15px; display:inline-flex; align-items:center; gap:10px; }
+        footer { text-align:center; padding:25px; border-top:1px solid var(--border-line); margin-top:auto; color:var(--text-sub); font-size:.9rem; background:var(--bg-card); }
+        @media (max-width:600px) { .container { padding:25px 20px; margin:20px auto; } h1 { font-size:1.8rem; } }
+    </style>
 </head>
 <body>
-<div id="site-header"></div>
-
-<section class="section">
-  <div class="container" style="max-width:860px">
-    <div class="breadcrumb"><a href="index.html">الرئيسية</a> / سياسة الخصوصية</div>
-    <div class="prose">
-      <h2>سياسة الخصوصية</h2>
-      <p><b>آخر تحديث:</b> سبتمبر 2026</p>
-      <p>نحن في «رقميّات ستور» نُدرك أهمية خصوصيتك ونلتزم بحماية بياناتك الشخصية وفق أعلى المعايير. توضّح هذه السياسة كيفية جمع بياناتك واستخدامها وحمايتها.</p>
-
-      <h2>1. البيانات التي نجمعها</h2>
-      <ul>
-        <li>بيانات الحساب: الاسم والبريد الإلكتروني وكلمة المرور المشفّرة.</li>
-        <li>بيانات الطلب: المنتجات المشتراة، تفاصيل الدفع، وسجل الطلبات.</li>
-        <li>بيانات تقنية: عنوان IP، نوع المتصفح، والصفحات التي تزورها.</li>
-      </ul>
-
-      <h2>2. كيف نستخدم بياناتك</h2>
-      <ul>
-        <li>تنفيذ طلباتك وإتمام عمليات التسليم.</li>
-        <li>تحسين تجربة التسوق وخدمة العملاء.</li>
-        <li>إرسال تحديثات وعروض (يمكنك إلغاء الاشتراك في أي وقت).</li>
-        <li>الامتثال للالتزامات القانونية ومكافحة الاحتيال.</li>
-      </ul>
-
-      <h2>3. ملفات تعريف الارتباط (Cookies)</h2>
-      <p>نستخدم ملفات تعريف الارتباط لتذكّر تفضيلاتك مثل سلة التسوق والوضع الليلي، مع الحفاظ على جلسة تسجيل الدخول.</p>
-
-      <h2>4. مشاركة البيانات</h2>
-      <p>لا نبيع بياناتك ولا نشاركها مع جهات خارجية إلا مع مزوّدي الدفع لتنفيذ المعاملات، أو عند الطلب القانوني الرسمي.</p>
-
-      <h2>5. أمان البيانات</h2>
-      <p>نستخدم تشفير SSL وتقنيات حماية حديثة، مع تقييد الوصول إلى البيانات الشخصية على الموظفين المصرّح لهم فقط.</p>
-
-      <h2>6. حقوقك</h2>
-      <ul>
-        <li>الوصول إلى بياناتك الشخصية ومراجعتها.</li>
-        <li>تصحيح أي بيانات غير دقيقة.</li>
-        <li>طلب حذف حسابك وبياناتك نهائياً.</li>
-        <li>الاعتراض على استخدام بياناتك لأغراض تسويقية.</li>
-      </ul>
-
-      <h2>7. تواصل معنا</h2>
-      <p>لأي استفسار بشأن الخصوصية: <a href="contact.html" style="color:var(--brand)">صفحة التواصل</a> أو support@raqmiyat.store</p>
-
-      <div class="notice warn">⚠️ هذه السياسة النموذجية لأغراض العرض، وقابلة للتعديل بحسب متطلباتك التشغيلية والقانونية.</div>
-    </div>
-  </div>
-</section>
-
-<div id="site-footer"></div>
-<script src="assets/js/app.js"></script>
+    <header class="navbar">
+        <div class="logo"><a href="index.html">الخزنة <span>الرقمية</span></a></div>
+        <a href="index.html" class="nav-link">الرئيسية</a>
+    </header>
+    <main class="container">
+        <span class="update-badge">آخر تحديث: سبتمبر 2026</span>
+        <h1>سياسة الخصوصية</h1>
+        <p class="intro-text">مرحباً بكم في متجر <strong>الخزنة الرقمية (DigiVault)</strong>. نولي خصوصية بياناتك اهتماماً بالغاً ونلتزم بحماية معلوماتك الشخصية وفقاً لأعلى المعايير والممارسات الرقمية.</p>
+        <h2>1. المعلومات التي نجمعها</h2>
+        <p>عند استخدامك لموقعنا أو التسجيل عبر بريدك الإلكتروني أو خدمات الدخول السريع، نجمع البيانات التالية لتقديم وتطوير خدماتنا:</p>
+        <ul>
+            <li><strong>المعلومات الشخصية الأساسية:</strong> الاسم الكامل، البريد الإلكتروني، وصورة الحساب الشخصية.</li>
+            <li><strong>بيانات الاستخدام الفنية:</strong> عنوان الـ IP، نوع المتصفح، نوع الجهاز، وصفحات الموقع التي قمت بزيارتها.</li>
+        </ul>
+        <h2>2. استخدام خدمات Google (Identity & AdSense)</h2>
+        <p>نحن نستخدم خدمات تقنية معتمدة من شركة Google لتأمين وتطوير الموقع وتحسين التجربة:</p>
+        <ul>
+            <li><strong>Google Identity Services:</strong> لتوفير ميزة تسجيل الدخول السريع والآمن دون الحاجة لكلمات مرور معقدة.</li>
+            <li><strong>Google AdSense:</strong> عرض إعلانات مخصصة أو غير مخصصة؛ حيث تستخدم جوجل ملفات تعريف الارتباط (Cookies) لعرض الإعلانات بناءً على زياراتك السابقة للموقع أو لمواقع أخرى على شبكة الإنترنت.</li>
+            <li>يمكن للمستخدمين التحكم في تفضيلات الإعلانات أو إلغاء الاشتراك في الإعلانات المخصصة عبر <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer" class="legal-link">إعدادات الإعلانات في Google</a>.</li>
+        </ul>
+        <h2>3. ملفات تعريف الارتباط (Cookies) والتخزين المحلي</h2>
+        <p>نستخدم ملفات تعريف الارتباط وتقنيات التخزين المحلي (LocalStorage) للأغراض التالية:</p>
+        <ul>
+            <li>حفظ حالة تسجيل الدخول وتسهيل الوصول الفوري لحسابك.</li>
+            <li>تذكر المنتجات، تفضيلات التصفح، وعربة التسوق المؤقتة داخل المتجر.</li>
+            <li>تحليل أنماط استخدام الموقع لتحسين الأداء وسرعة الاستجابة.</li>
+        </ul>
+        <h2>4. حماية البيانات ومشاركتها</h2>
+        <p>نطبق إجراءات أمان تقنية وتنظيمية مناسبة لحماية بياناتك من الوصول غير المصرح به أو التعديل أو الإفصاح. نؤكد لك أننا <strong>لا نبيع أو نؤجر بياناتك الشخصية لأي أطراف خارجية</strong> لأغراض تسويقية.</p>
+        <h2>5. حقوقك بشأن بياناتك</h2>
+        <p>يحق لك في أي وقت:</p>
+        <ul>
+            <li>الوصول إلى بياناتك الشخصية المخزنة لدينا.</li>
+            <li>طلب تصحيح أو تحديث أي معلومات غير دقيقة.</li>
+            <li>طلب حذف حسابك وبياناتك المسجلة لدينا بشكل نهائي.</li>
+        </ul>
+        <h2>6. الاتصال بنا</h2>
+        <p>إذا كان لديك أي استفسارات أو أسئلة تتعلق بسياسة الخصوصية، يمكنك التواصل معنا عبر:</p>
+        <div class="contact-box"><span>البريد الإلكتروني:</span><a href="mailto:support@digivault.com" class="legal-link">support@digivault.com</a></div>
+    </main>
+    <footer><p>جميع الحقوق محفوظة © 2026 الخزنة الرقمية (DigiVault)</p></footer>
+    <script type="module" src="./site-enhance.js"></script>
 </body>
 </html>

@@ -1,95 +1,359 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" data-theme="light">
+<html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>إتمام الشراء | رقميّات ستور</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إتمام عملية الدفع | الخزنة الرقمية</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-main:#0a0a12; --bg-card:#141424; --bg-sidebar:#10101c; --accent-cyan:#00d2ff; --accent-purple:#8a2be2; --accent-green:#00e676; --danger-red:#ff4757; --border-line:rgba(255,255,255,.08); --text-main:#fff; --text-sub:#a0a0c0; }
+        * { box-sizing:border-box; margin:0; padding:0; }
+        body { font-family:'Tajawal',sans-serif; background:var(--bg-main); color:var(--text-main); line-height:1.6; }
+        .page-wrapper { display:flex; min-height:100vh; }
+        .sidebar { width:260px; background:var(--bg-sidebar); border-left:1px solid var(--border-line); padding:25px 15px; display:flex; flex-direction:column; gap:20px; }
+        .sidebar-menu { list-style:none; display:flex; flex-direction:column; gap:10px; }
+        .sidebar-menu li a { display:flex; align-items:center; gap:12px; color:var(--text-sub); text-decoration:none; padding:12px 16px; border-radius:10px; font-weight:600; transition:.3s; }
+        .sidebar-menu li a:hover, .sidebar-menu li a.active { background:rgba(0,210,255,.1); color:var(--accent-cyan); border-right:3px solid var(--accent-cyan); }
+        .main-content { flex:1; padding:30px; max-width:950px; }
+        .checkout-grid { display:grid; grid-template-columns:1.2fr .8fr; gap:25px; }
+        .card-box { background:var(--bg-card); border:1px solid var(--border-line); border-radius:14px; padding:25px; margin-bottom:20px; }
+        .payment-tabs { display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; }
+        .tab-btn { flex:1; min-width:140px; padding:12px; background:rgba(255,255,255,.03); border:1px solid var(--border-line); color:var(--text-sub); border-radius:8px; cursor:pointer; font-weight:700; font-family:inherit; text-align:center; }
+        .tab-btn.active, .tab-btn:hover { background:rgba(0,210,255,.12); color:var(--accent-cyan); border-color:var(--accent-cyan); }
+        .pay-panel { display:none; }
+        .pay-panel.active { display:block; }
+        .account-details { background:rgba(0,0,0,.3); border:1px dashed var(--accent-cyan); padding:16px; border-radius:10px; margin-bottom:20px; font-size:.9rem; }
+        .account-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:10px; }
+        .account-row strong { color:var(--accent-cyan); font-family:monospace; font-size:1rem; }
+        .qr-preview { text-align:center; margin-top:15px; padding-top:12px; border-top:1px solid var(--border-line); }
+        .qr-preview img { width:130px; height:130px; border-radius:8px; background:#fff; padding:5px; margin-top:8px; }
+        .form-group { margin-bottom:15px; }
+        .form-group label { display:block; margin-bottom:6px; font-size:.88rem; color:var(--text-sub); font-weight:700; }
+        .form-group input { width:100%; background:#0a0a12; border:1px solid var(--border-line); padding:12px; border-radius:8px; color:#fff; font-family:inherit; font-size:.95rem; }
+        .form-group input:focus { border-color:var(--accent-cyan); outline:none; }
+        .form-group input.invalid { border-color:var(--danger-red); }
+        .error-msg { color:var(--danger-red); font-size:.78rem; margin-top:4px; display:none; }
+        .btn-submit { background:linear-gradient(135deg,var(--accent-cyan),var(--accent-purple)); color:#fff; border:none; padding:14px; border-radius:10px; font-weight:800; cursor:pointer; font-family:inherit; font-size:1.05rem; width:100%; transition:.3s; }
+        .btn-submit:hover:not(:disabled) { opacity:.9; transform:translateY(-2px); }
+        .btn-submit:disabled { opacity:.6; cursor:not-allowed; }
+        .summary-item { display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid var(--border-line); font-size:.95rem; }
+        .copy-tag { background:var(--accent-cyan); color:#000; padding:3px 8px; border-radius:4px; font-size:.75rem; cursor:pointer; font-weight:bold; }
+        .user-badge { background:rgba(0,210,255,.1); border:1px solid rgba(0,210,255,.3); padding:10px 15px; border-radius:8px; font-size:.85rem; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; }
+        #authGate { display:none; text-align:center; padding:60px 20px; color:var(--text-sub); }
+        #authGate a { color:var(--accent-cyan); font-weight:800; text-decoration:none; }
+        #toastContainer { position:fixed; bottom:25px; left:25px; z-index:9999; display:flex; flex-direction:column; gap:10px; }
+        .toast { background:var(--bg-card); border:1px solid var(--border-line); color:#fff; padding:14px 20px; border-radius:10px; box-shadow:0 10px 30px rgba(0,0,0,.5); font-size:.9rem; animation:slideIn .3s ease; border-right:4px solid var(--accent-green); }
+        .toast.error { border-right-color:var(--danger-red); }
+        @keyframes slideIn { from{transform:translateY(20px);opacity:0} to{transform:translateY(0);opacity:1} }
+        @media (max-width:768px){ .page-wrapper{flex-direction:column} .sidebar{width:100%} .checkout-grid{grid-template-columns:1fr} }
+    </style>
+
 </head>
 <body>
-<div id="site-header"></div>
+    <div class="page-wrapper">
+        <aside class="sidebar">
+            <div class="logo"><a href="index.html" style="font-size:1.5rem;font-weight:900;color:#fff;text-decoration:none;">الخزنة<span style="color:var(--accent-cyan);">الرقمية</span></a></div>
+            <ul class="sidebar-menu">
+                <li><a href="index.html">🏠 الصفحة الرئيسية</a></li>
+                <li><a href="shop.html">🛍️ تسوق الآن (المنتجات)</a></li>
+                <li><a href="cart.html">🛒 سلة المشتريات</a></li>
+                <li><a href="contact.html">📩 تواصل معنا والأسئلة</a></li>
+                <li><a href="profile.html">📦 مشترياتي</a></li>
+                <li><a href="checkout.html" class="active">💳 إتمام الدفع</a></li>
+                <li><a href="privacy.html">🔒 سياسة الخصوصية</a></li>
+            </ul>
+        </aside>
 
-<section class="section">
-  <div class="container">
-    <div class="breadcrumb"><a href="index.html">الرئيسية</a> / <a href="cart.html">السلة</a> / إتمام الشراء</div>
-    <div class="section-head" style="text-align:start"><h2>إتمام عملية الشراء</h2>
-      <p>أدخل بياناتك لإتمام الطلب واستلام منتجاتك فوراً.</p></div>
+        <main class="main-content">
+            <h1 style="margin-bottom:25px;font-size:1.8rem;">اختيار طريقة الدفع والتأكيد 💳</h1>
 
-    <div class="cart-layout" id="layout">
-      <form class="prose" id="form" style="padding:28px">
-        <h2 style="margin-top:0">بيانات المشتري</h2>
-        <div class="form-row">
-          <div class="form-group"><label>الاسم الكامل *</label><input name="name" required placeholder="مثال: أحمد محمد"></div>
-          <div class="form-group"><label>البريد الإلكتروني *</label><input type="email" name="email" required placeholder="you@email.com"></div>
-        </div>
-        <div class="form-row">
-          <div class="form-group"><label>رقم الجوال *</label><input name="phone" required placeholder="+966 5X XXX XXXX"></div>
-          <div class="form-group"><label>المدينة</label><input name="address" placeholder="الرياض"></div>
-        </div>
-        <h2>طريقة الدفع</h2>
-        <div class="form-group">
-          <label>اختر بوابة الدفع</label>
-          <select name="pay">
-            <option>بطاقة مدى / فيزا</option><option>PayPal</option>
-            <option>تحويل بنكي</option><option>Apple Pay</option>
-          </select>
-        </div>
-        <div class="notice info">🔒 جميع المعاملات مُشفّرة وآمنة تماماً. بياناتك محمية وفق سياسة الخصوصية.</div>
-        <button type="submit" class="btn btn-primary btn-block" style="margin-top:16px">تأكيد الدفع وشراء المنتجات ←</button>
-      </form>
+            <div id="userInfoDisplay" class="user-badge">
+                <span>👤 المشتري: <strong id="buyerEmailText">جاري التحقق...</strong></span>
+                <span id="authStatusText" style="color:var(--accent-cyan);">...</span>
+            </div>
 
-      <aside class="summary">
-        <h3>ملخّص الطلب</h3>
-        <div id="mini"></div>
-        <div class="sum-row total" style="margin-top:16px"><span>الإجمالي</span><b id="tot">-</b></div>
-      </aside>
+            <div id="authGate">
+                <p style="margin-bottom:15px;font-size:1.05rem;">🔒 يجب تسجيل الدخول أولاً لإتمام عملية الدفع.</p>
+                <a href="login.html">اضغط هنا لتسجيل الدخول</a>
+            </div>
+
+            <div class="checkout-grid" id="checkoutGrid" style="display:none;">
+                <div class="card-box">
+                    <div class="payment-tabs">
+                        <button class="tab-btn active" data-tab="dahabia">💳 الذهبية / BaridiMob</button>
+                        <button class="tab-btn" data-tab="ccp">🏛️ تحويل CCP</button>
+                        <button class="tab-btn" data-tab="visa">🌐 Visa / Mastercard</button>
+                    </div>
+
+                    <div id="dahabia-panel" class="pay-panel active">
+                        <div class="account-details">
+                            <div class="account-row">
+                                <span>رقم الحساب البريدي (RIP):</span>
+                                <strong id="demoRip">00799999999999999999</strong>
+                                <span class="copy-tag" data-copy="demoRip">نسخ</span>
+                            </div>
+                            <div class="account-row">
+                                <span>صاحب الحساب:</span>
+                                <span style="color:#fff;font-weight:bold;">الخزنة الرقمية</span>
+                            </div>
+                            <div class="qr-preview">
+                                <p style="color:var(--text-sub);font-size:.8rem;">امسح رمز QR في تطبيق BaridiMob للتحويل المباشر:</p>
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=00799999999999999999" alt="BaridiMob QR">
+                            </div>
+                        </div>
+                        <form id="dahabiaForm" data-method="الذهبية / BaridiMob">
+                            <div class="form-group">
+                                <label>رقم المعاملة (N° Transaction من تطبيق بريدي موب):</label>
+                                <input type="text" id="baridiTx" placeholder="أدخل رقم المعاملة" required>
+                                <div class="error-msg" id="baridiTxErr">يرجى إدخال رقم معاملة صحيح (أرقام فقط 4 خانات على الأقل)</div>
+                            </div>
+                            <div class="form-group">
+                                <label>اسم الحساب المحول منه:</label>
+                                <input type="text" id="baridiName" placeholder="اسمك الكامل" required>
+                                <div class="error-msg" id="baridiNameErr">يرجى كتابة الاسم الكامل</div>
+                            </div>
+                            <button type="submit" class="btn-submit">تأكيد عملية الدفع وإرسال الطلب للمراجعة 🚀</button>
+                        </form>
+                    </div>
+
+                    <div id="ccp-panel" class="pay-panel">
+                        <div class="account-details">
+                            <div class="account-row">
+                                <span>رقم الحساب CCP:</span>
+                                <strong id="demoCcp">12345678 Clé 99</strong>
+                                <span class="copy-tag" data-copy="demoCcp">نسخ</span>
+                            </div>
+                            <div class="account-row">
+                                <span>صاحب الحساب:</span>
+                                <span style="color:#fff;font-weight:bold;">الخزنة الرقمية</span>
+                            </div>
+                        </div>
+                        <form id="ccpForm" data-method="CCP البريدي">
+                            <div class="form-group">
+                                <label>رقم وصل التحويل البريدي (Reçu):</label>
+                                <input type="text" id="ccpRec" placeholder="أدخل رقم الوصل البريدي" required>
+                                <div class="error-msg" id="ccpRecErr">يرجى إدخال رقم وصل صحيح</div>
+                            </div>
+                            <button type="submit" class="btn-submit">تأكيد الدفع عبر CCP وإرسال الطلب للمراجعة 🚀</button>
+                        </form>
+                    </div>
+
+                    <div id="visa-panel" class="pay-panel">
+                        <p style="color:var(--text-sub);font-size:.85rem;margin-bottom:15px;padding:10px;border:1px dashed var(--danger-red);border-radius:8px;">
+                            ⚠️ هذه الطريقة قيد الإعداد حالياً (بانتظار ربط بوابة دفع رسمية مثل Chargily أو Stripe). الطلب سيُسجل بحالة "قيد المراجعة".
+                        </p>
+                        <form id="visaForm" data-method="Visa / Mastercard">
+                            <div class="form-group">
+                                <label>الاسم على البطاقة:</label>
+                                <input type="text" id="visaName" placeholder="Mohamed Yasser" required>
+                                <div class="error-msg" id="visaNameErr">يرجى إدخال الاسم المكتوب على البطاقة</div>
+                            </div>
+                            <div class="form-group">
+                                <label>رقم البطاقة:</label>
+                                <input type="text" id="visaCardNum" placeholder="4000 0000 0000 0000" maxlength="19" required>
+                                <div class="error-msg" id="visaCardNumErr">رقم البطاقة غير صحيح (16 رقماً)</div>
+                            </div>
+                            <div style="display:flex;gap:10px;">
+                                <div class="form-group" style="flex:1;">
+                                    <label>التاريخ (MM/YY):</label>
+                                    <input type="text" id="visaExp" placeholder="12/28" maxlength="5" required>
+                                    <div class="error-msg" id="visaExpErr">صيغة خاطئة</div>
+                                </div>
+                                <div class="form-group" style="flex:1;">
+                                    <label>رمز CVV:</label>
+                                    <input type="password" id="visaCvv" placeholder="123" maxlength="4" required>
+                                    <div class="error-msg" id="visaCvvErr">CVV غير صحيح</div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-submit">إرسال الطلب (قيد المراجعة) 💳</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card-box">
+                    <h2 style="font-size:1.2rem;margin-bottom:15px;">ملخص الطلب 🛍️</h2>
+                    <div id="orderItems"></div>
+                    <div style="margin-top:20px;border-top:2px dashed var(--border-line);padding-top:15px;display:flex;justify-content:space-between;font-weight:800;font-size:1.2rem;color:var(--accent-cyan);">
+                        <span>المجموع الكلي:</span>
+                        <span id="orderTotal">0.00 $</span>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
 
-    <div id="success" style="display:none"></div>
-  </div>
-</section>
+    <div id="toastContainer"></div>
 
-<div id="site-footer"></div>
-<script src="assets/js/app.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const items = cartItems();
-  if(!items.length){ document.getElementById('layout').innerHTML =
-    `<div class="empty" style="grid-column:1/-1"><div class="e-ico">🛒</div>
-     <h3>لا يوجد منتجات لإتمام الشراء</h3>
-     <a href="store.html" class="btn btn-primary" style="margin-top:16px">تصفّح المتجر ←</a></div>`; return }
+    <script type="module">
+        import { auth, db, getCart, esc } from "./firebase-init.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-  const u = currentUser();
-  if(u){ document.querySelector('[name=name]').value = u.name; document.querySelector('[name=email]').value = u.email }
+        let currentBuyerEmail = null;
+        let calculatedTotalNum = 0;
 
-  document.getElementById('mini').innerHTML = items.map(c=>
-    `<div class="sum-row"><span>${c.product.title} × ${c.qty}</span><span>${money(c.product.price*c.qty)}</span></div>`).join('');
-  const total = cartSubtotal();
-  document.getElementById('tot').textContent = money(total);
+        function showToast(message, type = 'success') {
+            const container = document.getElementById("toastContainer");
+            const toast = document.createElement("div");
+            toast.className = `toast${type === 'error' ? ' error' : ''}`;
+            toast.innerHTML = `<span>${type === 'success' ? '✅' : '❌'}</span><span>${esc(message)}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = '.3s'; setTimeout(() => toast.remove(), 300); }, 3500);
+        }
 
-  document.getElementById('form').addEventListener('submit', e=>{
-    e.preventDefault();
-    const f = Object.fromEntries(new FormData(e.target));
-    let order;
-    try{ order = placeOrder(f) }catch(err){ toast(err.message,'error'); return }
-    document.getElementById('layout').style.display='none';
-    const box = document.getElementById('success'); box.style.display='block';
-    box.innerHTML = `
-      <div class="prose" style="text-align:center;max-width:640px;margin:0 auto">
-        <div style="font-size:64px">✅</div>
-        <h2>تم إتمام طلبك بنجاح!</h2>
-        <p>شكراً ${order.name}! رقم طلبك هو <b style="color:var(--brand)">${order.id}</b>.</p>
-        <p>تم إرسال روابط التحميل إلى بريدك: <b>${order.email}</b></p>
-        <div class="sum-row total" style="justify-content:center;gap:14px"><span>الإجمالي المدفوع</span><b>${money(order.total)}</b></div>
-        <div style="display:flex;gap:12px;justify-content:center;margin-top:24px;flex-wrap:wrap">
-          <a href="dashboard.html" class="btn btn-primary">الذهاب إلى لوحة حسابي</a>
-          <a href="store.html" class="btn btn-outline">متابعة التسوق</a>
-        </div>
-      </div>`;
-    toast('تم إنشاء الطلب بنجاح ✓','success');
-  });
-});
-</script>
+        onAuthStateChanged(auth, (user) => {
+            const checkoutGrid = document.getElementById("checkoutGrid");
+            const authGate = document.getElementById("authGate");
+            if (user && user.email) {
+                currentBuyerEmail = user.email;
+                document.getElementById("buyerEmailText").innerText = user.email;
+                document.getElementById("authStatusText").innerText = "متصل ✅";
+                checkoutGrid.style.display = "grid";
+                authGate.style.display = "none";
+                loadSummary();
+            } else {
+                currentBuyerEmail = null;
+                checkoutGrid.style.display = "none";
+                authGate.style.display = "block";
+                document.getElementById("buyerEmailText").innerText = "غير مسجل";
+                document.getElementById("authStatusText").innerText = "";
+            }
+        });
+
+        // التبويبات (بدون inline onclick)
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.pay-panel').forEach(p => p.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(btn.dataset.tab + '-panel').classList.add('active');
+            });
+        });
+
+        document.querySelectorAll('.copy-tag').forEach(tag => {
+            tag.addEventListener('click', () => {
+                const text = document.getElementById(tag.dataset.copy).innerText;
+                navigator.clipboard.writeText(text);
+                showToast("تم نسخ الرقم بنجاح!");
+            });
+        });
+
+        function loadSummary() {
+            const cart = getCart();
+            const container = document.getElementById("orderItems");
+            calculatedTotalNum = 0;
+
+            if (cart.length === 0) {
+                container.innerHTML = "<p style='color:var(--text-sub);'>السلة فارغة. <a href='shop.html' style='color:var(--accent-cyan);'>تصفح المنتجات</a></p>";
+                document.getElementById("orderTotal").innerText = "0.00 $";
+                return;
+            }
+
+            container.innerHTML = cart.map(item => {
+                const priceNum = parseFloat(String(item.price).replace(/[^0-9.]/g, '')) || 0;
+                calculatedTotalNum += priceNum;
+                return `<div class="summary-item"><span>${esc(item.title || item.name || 'منتج')}</span><span style="color:var(--accent-cyan);font-weight:bold;">${esc(item.price)}</span></div>`;
+            }).join('');
+
+            document.getElementById("orderTotal").innerText = calculatedTotalNum.toFixed(2) + " $";
+        }
+
+        function validateFields(method) {
+            let isValid = true;
+            document.querySelectorAll('.error-msg').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('input').forEach(el => el.classList.remove('invalid'));
+
+            const mark = (inputId, errId) => {
+                document.getElementById(inputId).classList.add('invalid');
+                document.getElementById(errId).style.display = 'block';
+                isValid = false;
+            };
+
+            if (method.includes('الذهبية')) {
+                if (!/^\d{4,}$/.test(document.getElementById('baridiTx').value.trim())) mark('baridiTx', 'baridiTxErr');
+                if (document.getElementById('baridiName').value.trim().length < 3) mark('baridiName', 'baridiNameErr');
+            } else if (method.includes('CCP')) {
+                if (document.getElementById('ccpRec').value.trim().length < 3) mark('ccpRec', 'ccpRecErr');
+            } else {
+                if (document.getElementById('visaName').value.trim().length < 2) mark('visaName', 'visaNameErr');
+                if (!/^\d{16}$/.test(document.getElementById('visaCardNum').value.replace(/\s+/g, ''))) mark('visaCardNum', 'visaCardNumErr');
+                if (!/^\d{2}\/\d{2}$/.test(document.getElementById('visaExp').value.trim())) mark('visaExp', 'visaExpErr');
+                if (!/^\d{3,4}$/.test(document.getElementById('visaCvv').value.trim())) mark('visaCvv', 'visaCvvErr');
+            }
+            return isValid;
+        }
+
+        async function processOrder(e, method) {
+            e.preventDefault();
+
+            if (!currentBuyerEmail) {
+                showToast("يجب تسجيل الدخول أولاً", "error");
+                setTimeout(() => { window.location.href = "login.html"; }, 1200);
+                return;
+            }
+
+            const cart = getCart();
+            if (cart.length === 0) {
+                showToast("السلة فارغة!", "error");
+                return;
+            }
+
+            if (!validateFields(method)) {
+                showToast("يرجى تصحيح الأخطاء في الحقول", "error");
+                return;
+            }
+
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = "جاري المعالجة... ⏳";
+
+            try {
+                let paymentDetails = {};
+                if (method.includes('الذهبية')) {
+                    paymentDetails = {
+                        txNumber: document.getElementById('baridiTx').value.trim(),
+                        accountName: document.getElementById('baridiName').value.trim()
+                    };
+                } else if (method.includes('CCP')) {
+                    paymentDetails = { receiptNumber: document.getElementById('ccpRec').value.trim() };
+                } else {
+                    const rawCardNum = document.getElementById('visaCardNum').value.replace(/\s+/g, '');
+                    paymentDetails = {
+                        cardholder: document.getElementById('visaName').value.trim(),
+                        cardLast4: rawCardNum.slice(-4)
+                    };
+                }
+
+                // ✅ أمان: لا نخزن أي رابط تحميل في الطلب أبداً
+                const safeItems = cart.map(({ downloadUrl, fileUrl, ...rest }) => rest);
+
+                await addDoc(collection(db, "orders"), {
+                    buyerEmail: currentBuyerEmail,
+                    items: safeItems,
+                    totalAmount: calculatedTotalNum.toFixed(2),
+                    paymentMethod: method,
+                    paymentDetails: paymentDetails,
+                    status: "pending",
+                    createdAt: serverTimestamp()
+                });
+
+                showToast(`تم إرسال طلبك بنجاح عبر [${method}]! بانتظار تأكيد الإدارة.`);
+                localStorage.removeItem("digivaultCart");
+                setTimeout(() => { window.location.href = "profile.html"; }, 1500);
+            } catch (err) {
+                console.error(err);
+                showToast("حدث خطأ أثناء حفظ الطلب: " + err.message, "error");
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        }
+
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', (e) => processOrder(e, form.dataset.method));
+        });
+    </script>
+    <script type="module" src="./site-enhance.js"></script>
 </body>
 </html>

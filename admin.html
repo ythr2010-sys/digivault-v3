@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم DigiVault - إدارة متكاملة</title>
+    <script>
+        // فحص: هل ملف firebase-init.js موجود؟ (يمنع "لا استجابة" الصامتة)
+        setTimeout(() => {
+            if (!window.__dvLoaded) {
+                document.body.insertAdjacentHTML('afterbegin',
+                    '<div style="background:#ff4757;color:#fff;padding:14px;text-align:center;font-weight:bold;font-family:Tahoma;">'
+                    + '⚠️ خطأ: ملف firebase-init.js غير موجود بجانب admin.html - ارفعه وأعد تحميل الصفحة</div>');
+            }
+        }, 3000);
+    </script>
+    <style>
+        :root { --bg-primary:#0a0b10; --bg-secondary:#12151e; --accent-cyan:#00f0ff; --accent-purple:#7928ca; --text-main:#f0f6fc; --text-sub:#8b949e; --danger-red:#ff3366; --success-green:#00ff66; --warning-orange:#ffab00; --border-color:rgba(255,255,255,.08); }
+        * { box-sizing:border-box; margin:0; padding:0; font-family:'Segoe UI',Tahoma,sans-serif; }
+        body { background:var(--bg-primary); color:var(--text-main); min-height:100vh; padding:20px; }
+        .container { max-width:1300px; margin:0 auto; }
+        .card { background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:12px; padding:20px; margin-bottom:20px; }
+        .auth-box { max-width:400px; margin:100px auto; text-align:center; }
+        input, select, textarea, button { width:100%; padding:12px; margin-bottom:12px; border-radius:8px; border:1px solid var(--border-color); background:rgba(0,0,0,.3); color:var(--text-main); font-size:14px; font-family:inherit; }
+        button { background:linear-gradient(135deg,var(--accent-purple),var(--accent-cyan)); border:none; font-weight:bold; cursor:pointer; }
+        button:hover { opacity:.9; }
+        table { width:100%; border-collapse:collapse; margin-top:15px; }
+        th, td { padding:12px; text-align:right; border-bottom:1px solid var(--border-color); font-size:13px; }
+        th { background:rgba(255,255,255,.02); color:var(--accent-cyan); }
+        .badge { padding:4px 10px; border-radius:20px; font-size:11px; font-weight:bold; display:inline-block; }
+        .badge-approved { background:rgba(0,255,102,.15); color:var(--success-green); }
+        .badge-pending { background:rgba(255,171,0,.15); color:var(--warning-orange); }
+        .badge-rejected { background:rgba(255,51,102,.15); color:var(--danger-red); cursor:help; }
+        .btn-action { padding:6px 12px; width:auto; margin-left:5px; font-size:12px; border-radius:6px; display:inline-block; }
+        .btn-approve { background:rgba(0,255,102,.2); color:var(--success-green); border:1px solid var(--success-green); }
+        .btn-reject { background:rgba(255,51,102,.2); color:var(--danger-red); border:1px solid var(--danger-red); }
+        .btn-edit { background:rgba(0,240,255,.2); color:var(--accent-cyan); border:1px solid var(--accent-cyan); }
+        .btn-delete { background:rgba(255,51,102,.2); color:var(--danger-red); border:1px solid var(--danger-red); }
+        .btn-file { background:rgba(255,171,0,.2); color:var(--warning-orange); border:1px solid var(--warning-orange); }
+        .img-preview { width:45px; height:45px; object-fit:cover; border-radius:6px; border:1px solid var(--border-color); }
+        .grid-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:15px; margin-bottom:20px; }
+        .stat-card { background:var(--bg-secondary); border:1px solid var(--border-color); padding:15px; border-radius:10px; text-align:center; }
+        .stat-card h3 { font-size:24px; color:var(--accent-cyan); margin-top:5px; }
+        #dashboardContent { display:none; }
+        .error-msg { color:var(--danger-red); margin-bottom:10px; display:none; font-size:13px; }
+        .access-denied { max-width:500px; margin:100px auto; text-align:center; color:var(--danger-red); font-size:1.2rem; font-weight:bold; }
+        .reply-box { width:100%; min-width:200px; }
+        .order-items-detail { font-size:11px; color:var(--text-sub); }
+        .pay-details { font-size:11px; color:var(--warning-orange); }
+    </style>
+
+</head>
+<body>
+
+    <div id="authScreen" class="card auth-box">
+        <h2>🔐 دخول الإدارة</h2>
+        <p style="color:var(--text-sub);margin-bottom:15px;font-size:13px;">أدخل بيانات حساب المدير للمتابعة</p>
+        <div id="errorMsg" class="error-msg"></div>
+        <input type="email" id="loginEmail" placeholder="البريد الإلكتروني">
+        <input type="password" id="loginPass" placeholder="كلمة المرور">
+        <button id="loginBtn">دخول 🚀</button>
+        <p style="color:var(--text-sub);font-size:11px;margin-top:10px;">إذا ضغطت دخول ولا يحدث شيء، افتح Console (F12) وانظر الخطأ، أو تأكد أن ملف firebase-init.js مرفوع بجانب هذه الصفحة.</p>
+    </div>
+
+    <div id="accessDenied" class="access-denied" style="display:none;">⛔ هذه الصفحة مخصصة لإدارة الموقع فقط.</div>
+
+    <div id="dashboardContent" class="container">
+        <div class="card" style="display:flex;justify-content:space-between;align-items:center;">
+            <div>
+                <h2>⚡ لوحة تحكم DigiVault</h2>
+                <small id="adminEmailDisplay" style="color:var(--text-sub);"></small>
+            </div>
+            <button id="logoutBtn" style="width:auto;background:var(--danger-red);">تسجيل خروج 🚪</button>
+        </div>
+
+        <div class="grid-stats">
+            <div class="stat-card"><span>إجمالي المنتجات</span><h3 id="statProducts">0</h3></div>
+            <div class="stat-card"><span>الطلبات</span><h3 id="statOrders">0</h3></div>
+            <div class="stat-card"><span>الرسائل</span><h3 id="statMessages">0</h3></div>
+        </div>
+
+        <div class="card">
+            <h3 id="formTitle">➕ إضافة منتج جديد</h3>
+            <form id="productForm">
+                <input type="hidden" id="editDocId">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                    <input type="text" id="pTitle" placeholder="عنوان المنتج" required>
+                    <select id="pCat">
+                        <option value="books">📚 كتب وروايات</option>
+                        <option value="models">🎨 مجسمات 3D/2D</option>
+                        <option value="courses">🎓 دورات تعليمية</option>
+                        <option value="gaming">🎮 ألعاب واشتراكات</option>
+                    </select>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                    <input type="text" id="pBadge" placeholder="الشارة (مثال: الأفضل مبيعاً)">
+                    <input type="text" id="pPrice" placeholder="السعر (مثال: $10 أو مجاني)" required>
+                </div>
+                <input type="url" id="pImg" placeholder="رابط صورة المنتج الرئيسية" required>
+                <textarea id="pPromo" rows="2" placeholder="روابط صور ترويجية إضافية (افصل بينها بفاصلة) - اختياري"></textarea>
+                <input type="url" id="pLink" placeholder="رابط التحميل / التسليم الرقمي (لمنتجاتك أنت)">
+                <textarea id="pDesc" rows="3" placeholder="وصف المنتج التفصيلي..."></textarea>
+                <div style="display:flex;gap:10px;">
+                    <button type="submit" id="saveBtn">حفظ ونشر المنتج 💾</button>
+                    <button type="button" id="cancelBtn" style="display:none;background:var(--text-sub);">إلغاء التعديل</button>
+                </div>
+            </form>
+
+            <hr style="border-color:var(--border-color);margin:20px 0;">
+
+            <div style="display:flex;gap:10px;margin-bottom:15px;">
+                <input type="text" id="searchInput" placeholder="ابحث عن منتج..." style="margin-bottom:0;">
+                <select id="filterStatus" style="width:200px;margin-bottom:0;">
+                    <option value="all">كل الحالة</option>
+                    <option value="approved">معتمد ومنشور</option>
+                    <option value="pending">بانتظار الموافقة</option>
+                    <option value="rejected">مرفوض</option>
+                </select>
+            </div>
+
+            <div style="overflow-x:auto;">
+                <table>
+                    <thead><tr><th>الصورة</th><th>العنوان</th><th>البائع</th><th>الملف</th><th>الحالة</th><th>السعر</th><th>الإجراءات</th></tr></thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>📦 الطلبات الأخيرة</h3>
+            <div style="overflow-x:auto;">
+                <table>
+                    <thead><tr><th>الطلب</th><th>المشتري</th><th>المنتجات</th><th>المبلغ</th><th>الدفع</th><th>الحالة</th><th>الإجراء</th></tr></thead>
+                    <tbody id="ordersTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>💬 رسائل التواصل والاستفسارات</h3>
+            <div style="overflow-x:auto;">
+                <table>
+                    <thead><tr><th>المرسل</th><th>النوع</th><th>الرسالة</th><th>الرد والتحكم</th></tr></thead>
+                    <tbody id="messagesTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { auth, db, storage, checkIsAdmin, esc } from "./firebase-init.js";
+        import { signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { collection, getDocs, addDoc, doc, setDoc, getDoc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { ref, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+
+        let productsList = [];
+        let currentUserObj = null;
+
+        async function notifyUser(userEmail, type, title, message) {
+            if (!userEmail) return;
+            try {
+                await addDoc(collection(db, "notifications"), {
+                    userEmail, type, title, message, read: false, createdAt: serverTimestamp()
+                });
+            } catch (e) { console.error("تعذر إرسال الإشعار:", e); }
+        }
+
+        onAuthStateChanged(auth, async (user) => {
+            currentUserObj = user;
+            if (user) {
+                const isAdmin = await checkIsAdmin(user);
+                if (!isAdmin) {
+                    document.getElementById("authScreen").style.display = "none";
+                    document.getElementById("accessDenied").style.display = "block";
+                    return;
+                }
+                document.getElementById("authScreen").style.display = "none";
+                document.getElementById("dashboardContent").style.display = "block";
+                document.getElementById("adminEmailDisplay").textContent = "مسجل كـ: " + user.email;
+                loadAllData();
+            } else {
+                document.getElementById("authScreen").style.display = "block";
+                document.getElementById("dashboardContent").style.display = "none";
+            }
+        });
+
+        document.getElementById("loginBtn").addEventListener("click", async () => {
+            const errorMsg = document.getElementById("errorMsg");
+            errorMsg.style.display = "none";
+            try {
+                await signInWithEmailAndPassword(auth,
+                    document.getElementById("loginEmail").value.trim(),
+                    document.getElementById("loginPass").value);
+            } catch (err) {
+                console.error(err);
+                errorMsg.textContent = "❌ " + (err.code === 'auth/invalid-credential' ? 'البريد أو كلمة المرور غير صحيحة' : 'خطأ: ' + err.message);
+                errorMsg.style.display = "block";
+            }
+        });
+        document.getElementById("loginPass").addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById("loginBtn").click(); });
+        document.getElementById("logoutBtn").addEventListener("click", async () => { await signOut(auth); });
+
+        function loadAllData() { loadProducts(); loadOrders(); loadMessages(); }
+
+        // ============ المنتجات ============
+        async function loadProducts() {
+            try {
+                const snap = await getDocs(collection(db, "products"));
+                productsList = [];
+                snap.forEach(d => productsList.push({ id: d.id, ...d.data() }));
+                productsList.sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
+                document.getElementById("statProducts").textContent = productsList.length;
+                filterTable();
+            } catch (e) { console.error("خطأ في جلب المنتجات:", e); }
+        }
+
+        function filterTable() {
+            const searchVal = document.getElementById("searchInput").value.toLowerCase();
+            const filterStat = document.getElementById("filterStatus").value;
+            const filtered = productsList.filter(p =>
+                (p.title || "").toLowerCase().includes(searchVal) &&
+                (filterStat === 'all' || p.status === filterStat));
+            renderTable(filtered);
+        }
+        document.getElementById("searchInput").addEventListener("input", filterTable);
+        document.getElementById("filterStatus").addEventListener("change", filterTable);
+
+        function renderTable(list) {
+            const tbody = document.getElementById("tableBody");
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text-sub);">لا توجد منتجات مطابقة.</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = list.map(p => {
+                let statusBadge;
+                if (p.status === 'approved') statusBadge = `<span class="badge badge-approved">معتمد ومنشور</span>`;
+                else if (p.status === 'rejected') statusBadge = `<span class="badge badge-rejected" title="${esc(p.rejectionReason || '')}">مرفوض ⓘ</span>`;
+                else statusBadge = `<span class="badge badge-pending">بانتظار الموافقة</span>`;
+
+                return `
+                    <tr>
+                        <td><img src="${esc(p.imageUrl || '')}" class="img-preview" alt="" onerror="this.src='https://via.placeholder.com/45'"></td>
+                        <td><strong>${esc(p.title)}</strong></td>
+                        <td><small>${esc(p.sellerEmail || 'الإدارة')}</small></td>
+                        <td><button class="btn-action btn-file" data-file="${p.id}">📂 الملف</button></td>
+                        <td>${statusBadge}</td>
+                        <td style="color:var(--accent-cyan);font-weight:bold;">${esc(p.price)}</td>
+                        <td>
+                            ${p.status !== 'approved' ? `<button class="btn-action btn-approve" data-act="approve" data-id="${p.id}">قبول ✅</button>` : ''}
+                            ${p.status !== 'rejected' ? `<button class="btn-action btn-reject" data-act="reject" data-id="${p.id}">رفض ❌</button>` : ''}
+                            <button class="btn-action btn-edit" data-act="edit" data-id="${p.id}">تعديل ✏️</button>
+                            <button class="btn-action btn-delete" data-act="delete" data-id="${p.id}">حذف 🗑️</button>
+                        </td>
+                    </tr>`;
+            }).join('');
+
+            tbody.querySelectorAll('button').forEach(btn => {
+                if (btn.dataset.file) {
+                    btn.addEventListener('click', () => viewProductFile(btn.dataset.file));
+                    return;
+                }
+                btn.addEventListener('click', () => {
+                    const { act, id } = btn.dataset;
+                    if (act === 'approve') approveProduct(id);
+                    else if (act === 'reject') rejectProduct(id);
+                    else if (act === 'edit') startEdit(id);
+                    else if (act === 'delete') removeProduct(id);
+                });
+            });
+        }
+
+        // عرض/تحميل ملف المنتج المرفوع من البائع
+        async function viewProductFile(productId) {
+            try {
+                const snap = await getDoc(doc(db, "product_files", productId));
+                if (!snap.exists()) { alert("لا يوجد ملف مرتبط بهذا المنتج."); return; }
+                const data = snap.data();
+                if (data.storagePath) {
+                    const url = await getDownloadURL(ref(storage, data.storagePath));
+                    window.open(url, '_blank');
+                } else if (data.downloadUrl) {
+                    window.open(data.downloadUrl, '_blank');
+                } else {
+                    alert("لا يوجد ملف.");
+                }
+            } catch (e) { alert("خطأ في فتح الملف: " + e.message); }
+        }
+
+        async function approveProduct(id) {
+            try {
+                const p = productsList.find(x => x.id === id);
+                await updateDoc(doc(db, "products", id), { status: "approved" });
+                await notifyUser(p.sellerEmail, "product", "تم قبول منتجك ✅ 🎉",
+                    `مبروك! تمت الموافقة على منتج "${p.title}" وأصبح معروضاً في المتجر الآن.`);
+                loadProducts();
+            } catch (e) { alert("خطأ: " + e.message); }
+        }
+
+        async function rejectProduct(id) {
+            const reason = prompt("سبب الرفض (سيصل للبائع مع إشعار):");
+            if (reason === null) return;
+            try {
+                const p = productsList.find(x => x.id === id);
+                await updateDoc(doc(db, "products", id), { status: "rejected", rejectionReason: reason });
+                await notifyUser(p.sellerEmail, "product", "تم رفض منتجك ❌",
+                    `تم رفض منتج "${p.title}".
+السبب: ${reason}
+عدّل المنتج وأعد الإرسال.`);
+                loadProducts();
+            } catch (e) { alert("خطأ: " + e.message); }
+        }
+
+        function startEdit(id) {
+            const p = productsList.find(x => x.id === id);
+            if (!p) return;
+            document.getElementById("editDocId").value = id;
+            document.getElementById("pTitle").value = p.title || "";
+            document.getElementById("pCat").value = p.category || "books";
+            document.getElementById("pBadge").value = p.badge || "";
+            document.getElementById("pPrice").value = p.price || "";
+            document.getElementById("pImg").value = p.imageUrl || "";
+            document.getElementById("pPromo").value = (p.promoImages || []).join(', ');
+            document.getElementById("pDesc").value = p.description || "";
+            document.getElementById("pLink").value = "";
+            document.getElementById("formTitle").textContent = "✏️ تعديل: " + p.title;
+            document.getElementById("saveBtn").textContent = "حفظ التعديلات 💾";
+            document.getElementById("cancelBtn").style.display = "inline-block";
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        document.getElementById("cancelBtn").addEventListener("click", resetForm);
+
+        function resetForm() {
+            document.getElementById("productForm").reset();
+            document.getElementById("editDocId").value = "";
+            document.getElementById("formTitle").textContent = "➕ إضافة منتج جديد";
+            document.getElementById("saveBtn").textContent = "حفظ ونشر المنتج 💾";
+            document.getElementById("cancelBtn").style.display = "none";
+        }
+
+        async function removeProduct(id) {
+            if (!confirm("حذف هذا المنتج نهائياً؟")) return;
+            try {
+                await deleteDoc(doc(db, "products", id));
+                await deleteDoc(doc(db, "product_files", id));
+                loadProducts();
+            } catch (e) { alert("خطأ: " + e.message); }
+        }
+
+        document.getElementById("productForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const editId = document.getElementById("editDocId").value;
+            const saveBtn = document.getElementById("saveBtn");
+            saveBtn.disabled = true;
+
+            const promoStr = document.getElementById("pPromo").value.trim();
+            const data = {
+                title: document.getElementById("pTitle").value.trim(),
+                category: document.getElementById("pCat").value,
+                badge: document.getElementById("pBadge").value.trim() || "منتج رقمي",
+                price: document.getElementById("pPrice").value.trim(),
+                imageUrl: document.getElementById("pImg").value.trim(),
+                promoImages: promoStr ? promoStr.split(',').map(s => s.trim()).filter(Boolean) : [],
+                description: document.getElementById("pDesc").value.trim()
+            };
+            const newLink = document.getElementById("pLink").value.trim();
+
+            try {
+                if (editId) {
+                    await updateDoc(doc(db, "products", editId), data);
+                    if (newLink) {
+                        await updateDoc(doc(db, "product_files", editId), { downloadUrl: newLink });
+                    }
+                } else {
+                    data.sellerEmail = currentUserObj.email;
+                    data.status = "approved";
+                    data.createdAt = serverTimestamp();
+                    const docRef = await addDoc(collection(db, "products"), data);
+                    if (newLink) {
+                        await setDoc(doc(db, "product_files", docRef.id), {
+                            downloadUrl: newLink, sellerEmail: currentUserObj.email
+                        });
+                    }
+                }
+                resetForm();
+                loadProducts();
+            } catch (err) {
+                alert("خطأ: " + err.message);
+            } finally {
+                saveBtn.disabled = false;
+            }
+        });
+
+        // ============ الطلبات ============
+        async function loadOrders() {
+            try {
+                const snap = await getDocs(collection(db, "orders"));
+                const orders = [];
+                snap.forEach(d => orders.push({ id: d.id, ...d.data() }));
+                orders.sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
+                document.getElementById("statOrders").textContent = orders.length;
+                renderOrders(orders);
+            } catch (e) { console.error("خطأ في جلب الطلبات:", e); }
+        }
+
+        function renderOrders(orders) {
+            const tbody = document.getElementById("ordersTableBody");
+            if (orders.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text-sub);">لا توجد طلبات.</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = orders.map(o => {
+                const items = (o.items || []).map(i => `${esc(i.title || i.name || 'منتج')}<br><span class="order-items-detail">${esc(i.price || '')}</span>`).join('<hr style="border-color:var(--border-color);margin:4px 0;">');
+                const isCompleted = o.status === 'completed';
+                const pay = o.paymentDetails ? Object.values(o.paymentDetails).join(' / ') : '';
+                return `
+                    <tr>
+                        <td><small>#${esc(o.id.slice(0, 6))}</small></td>
+                        <td><small>${esc(o.buyerEmail)}</small></td>
+                        <td>${items || '-'}</td>
+                        <td style="color:var(--accent-cyan);font-weight:bold;">${esc(o.totalAmount)} $</td>
+                        <td><small>${esc(o.paymentMethod || '')}</small><br><span class="pay-details">${esc(pay)}</span></td>
+                        <td>${isCompleted ? '<span class="badge badge-approved">مكتمل ✅</span>' : '<span class="badge badge-pending">قيد المراجعة</span>'}</td>
+                        <td>
+                            ${!isCompleted ? `<button class="btn-action btn-approve" data-order="${o.id}">إتمام وتسليم ✅</button>` : ''}
+                            <button class="btn-action btn-delete" data-del-order="${o.id}">حذف 🗑️</button>
+                        </td>
+                    </tr>`;
+            }).join('');
+
+            tbody.querySelectorAll('[data-order]').forEach(btn => {
+                btn.addEventListener('click', () => completeOrder(btn.dataset.order, orders));
+            });
+            tbody.querySelectorAll('[data-del-order]').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    if (!confirm("حذف هذا الطلب نهائياً؟")) return;
+                    await deleteDoc(doc(db, "orders", btn.dataset.delOrder));
+                    loadOrders();
+                });
+            });
+        }
+
+        // إتمام الطلب: توليد روابط التسليم من Storage أو الروابط الخارجية
+        async function completeOrder(orderId, orders) {
+            const order = orders.find(o => o.id === orderId);
+            if (!order) return;
+            try {
+                const deliveryLinks = [];
+                for (const item of (order.items || [])) {
+                    if (!item.id) continue;
+                    const fileSnap = await getDoc(doc(db, "product_files", item.id));
+                    if (!fileSnap.exists()) continue;
+                    const fdata = fileSnap.data();
+                    let url = fdata.downloadUrl || null;
+                    if (!url && fdata.storagePath) {
+                        url = await getDownloadURL(ref(storage, fdata.storagePath));
+                    }
+                    if (url) {
+                        deliveryLinks.push({ productId: item.id, name: item.title || item.name, url });
+                    }
+                }
+                if (deliveryLinks.length === 0) {
+                    alert("⚠️ لم يتم العثور على روابط تحميل لمنتجات هذا الطلب!");
+                    return;
+                }
+                await updateDoc(doc(db, "orders", orderId), { status: "completed", deliveryLinks });
+                await notifyUser(order.buyerEmail, "order", "تم تفعيل طلبك 🎉",
+                    "تم تأكيد دفعك! روابط التحميل أصبحت متاحة في صفحة مشترياتك. شكراً لثقتك!");
+                loadOrders();
+            } catch (e) { alert("خطأ: " + e.message); }
+        }
+
+        // ============ الرسائل ============
+        async function loadMessages() {
+            try {
+                const snap = await getDocs(collection(db, "contact_messages"));
+                const messages = [];
+                snap.forEach(d => messages.push({ id: d.id, ...d.data() }));
+                messages.sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
+                document.getElementById("statMessages").textContent = messages.length;
+                renderMessages(messages);
+            } catch (e) { console.error("خطأ في جلب الرسائل:", e); }
+        }
+
+        function renderMessages(messages) {
+            const tbody = document.getElementById("messagesTableBody");
+            if (messages.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:var(--text-sub);">لا توجد رسائل.</td></tr>`;
+                return;
+            }
+            const typeLabels = { feedback: '⭐ تقييم', issue: '⚠️ مشكلة', inquiry: '❓ استفسار' };
+            tbody.innerHTML = messages.map(m => `
+                <tr>
+                    <td><strong>${esc(m.name)}</strong><br><small style="color:var(--text-sub);">${esc(m.email)}</small></td>
+                    <td><span class="badge badge-pending">${typeLabels[m.requestType] || esc(m.requestType)}</span><br><small style="color:var(--text-sub);">#${esc(m.ticketId || '')}</small></td>
+                    <td><small>${esc(m.message)}</small></td>
+                    <td>
+                        <textarea class="reply-box" id="reply-${m.id}" rows="2" placeholder="اكتب الرد هنا...">${esc(m.adminReply || '')}</textarea>
+                        <button class="btn-action btn-approve" data-reply="${m.id}" data-email="${esc(m.email)}">إرسال الرد 📨</button>
+                        <button class="btn-action btn-delete" data-del-msg="${m.id}">حذف 🗑️</button>
+                    </td>
+                </tr>`).join('');
+
+            tbody.querySelectorAll('[data-reply]').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const replyText = document.getElementById("reply-" + btn.dataset.reply).value.trim();
+                    if (!replyText) { alert("اكتب الرد أولاً"); return; }
+                    try {
+                        await updateDoc(doc(db, "contact_messages", btn.dataset.reply), { adminReply: replyText, status: 'replied' });
+                        await notifyUser(btn.dataset.email, "support", "رد على استفسارك 💬", replyText);
+                        alert("تم إرسال الرد ووصل إشعار للمستخدم 🔔");
+                        loadMessages();
+                    } catch (e) { alert("خطأ: " + e.message); }
+                });
+            });
+
+            tbody.querySelectorAll('[data-del-msg]').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    if (!confirm("حذف هذه الرسالة؟")) return;
+                    await deleteDoc(doc(db, "contact_messages", btn.dataset.delMsg));
+                    loadMessages();
+                });
+            });
+        }
+    </script>
+    <script type="module" src="./site-enhance.js"></script>
+</body>
+</html>

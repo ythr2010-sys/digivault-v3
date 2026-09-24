@@ -1,98 +1,100 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" data-theme="light">
+<html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>سلة التسوق | رقميّات ستور</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سلة المشتريات | الخزنة الرقمية</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-main:#0a0a12; --bg-card:#141424; --accent-cyan:#00d2ff; --accent-purple:#8a2be2; --border-line:rgba(255,255,255,.08); --text-main:#fff; --text-sub:#a0a0c0; --danger-red:#ff4757; }
+        * { box-sizing:border-box; margin:0; padding:0; }
+        body { font-family:'Tajawal',sans-serif; background:var(--bg-main); color:var(--text-main); line-height:1.6; min-height:100vh; }
+        .navbar { display:flex; justify-content:space-between; align-items:center; padding:18px 8%; background:var(--bg-card); border-bottom:1px solid var(--border-line); position:sticky; top:0; z-index:100; }
+        .logo a { font-size:1.5rem; font-weight:800; color:var(--text-main); text-decoration:none; }
+        .logo a span { color:var(--accent-cyan); }
+        .nav-link { color:var(--accent-cyan); text-decoration:none; font-weight:500; }
+        .main-wrapper { max-width:800px; margin:40px auto; padding:0 20px; }
+        .container { background:var(--bg-card); border:1px solid var(--border-line); border-radius:16px; padding:30px; }
+        h1 { font-size:1.7rem; margin-bottom:25px; border-right:4px solid var(--accent-cyan); padding-right:12px; }
+        .cart-item { display:flex; justify-content:space-between; align-items:center; gap:15px; padding:16px; border:1px solid var(--border-line); border-radius:10px; margin-bottom:12px; flex-wrap:wrap; }
+        .cart-item-info strong { display:block; font-size:1.05rem; }
+        .cart-item-info span { color:#10b981; font-weight:800; font-size:1.1rem; }
+        .cart-actions { display:flex; gap:10px; align-items:center; }
+        .btn-remove { background:rgba(255,71,87,.15); color:var(--danger-red); border:1px solid var(--danger-red); padding:7px 14px; border-radius:8px; cursor:pointer; font-family:inherit; font-weight:700; }
+        .cart-total { display:flex; justify-content:space-between; align-items:center; margin-top:25px; padding-top:20px; border-top:2px dashed var(--border-line); font-size:1.3rem; font-weight:800; color:var(--accent-cyan); }
+        .btn-checkout { display:block; width:100%; margin-top:20px; background:linear-gradient(135deg,var(--accent-cyan),var(--accent-purple)); color:#fff; border:none; padding:15px; border-radius:10px; font-weight:800; font-size:1.1rem; cursor:pointer; font-family:inherit; text-decoration:none; text-align:center; }
+        .btn-checkout:hover { opacity:.9; }
+        .btn-continue { display:block; text-align:center; margin-top:15px; color:var(--text-sub); text-decoration:none; }
+        .empty { text-align:center; padding:50px 20px; color:var(--text-sub); }
+        .empty a { color:var(--accent-cyan); font-weight:800; text-decoration:none; }
+    </style>
 </head>
 <body>
-<div id="site-header"></div>
+    <header class="navbar">
+        <div class="logo"><a href="index.html">الخزنة <span>الرقمية</span></a></div>
+        <a href="shop.html" class="nav-link">← متابعة التسوق</a>
+    </header>
 
-<section class="section">
-  <div class="container">
-    <div class="breadcrumb"><a href="index.html">الرئيسية</a> / سلة التسوق</div>
-    <div class="section-head" style="text-align:start"><h2>سلة التسوق</h2>
-      <p>راجع منتجاتك قبل إتمام عملية الشراء.</p></div>
-
-    <div class="cart-layout" id="layout">
-      <div>
-        <div id="items"></div>
-        <div id="emptyBox"></div>
-      </div>
-      <aside class="summary" id="summary">
-        <h3>ملخّص الطلب</h3>
-        <div class="sum-row"><span>المجموع الفرعي</span><span id="sub">-</span></div>
-        <div class="sum-row"><span>الخصم</span><span id="disc">-</span></div>
-        <div class="sum-row"><span>الضريبة (15%)</span><span id="tax">-</span></div>
-        <div class="sum-row total"><span>الإجمالي</span><b id="tot">-</b></div>
-        <div class="form-group" style="margin:18px 0 12px">
-          <input id="coupon" placeholder="كود الخصم (جرّب: SAVE10)">
+    <div class="main-wrapper">
+        <div class="container">
+            <h1>🛒 سلة المشتريات</h1>
+            <div id="cartContent"></div>
         </div>
-        <button class="btn btn-outline btn-block btn-sm" onclick="applyCoupon()">تطبيق الكود</button>
-        <a href="checkout.html" class="btn btn-primary btn-block" style="margin-top:14px">إتمام الشراء ←</a>
-        <a href="store.html" class="btn btn-ghost btn-block btn-sm" style="margin-top:10px">متابعة التسوق</a>
-      </aside>
     </div>
-  </div>
-</section>
 
-<div id="site-footer"></div>
-<script src="assets/js/app.js"></script>
-<script>
-let discount = 0;
-function applyCoupon(){
-  const c = document.getElementById('coupon').value.trim().toUpperCase();
-  if(c === 'SAVE10'){ discount = 0.10; toast('تم تطبيق خصم 10% ✓','success') }
-  else if(c === 'SAVE20'){ discount = 0.20; toast('تم تطبيق خصم 20% ✓','success') }
-  else { discount = 0; toast('كود الخصم غير صالح','error') }
-  render();
-}
-function pay(id,q){ setQty(id,q); render() }
-function del(id){ removeFromCart(id); toast('تم حذف المنتج من السلة'); render() }
-function render(){
-  const items = cartItems();
-  const host = document.getElementById('items');
-  const layout = document.getElementById('layout');
+    <script type="module">
+        import { getCart, saveCart, esc } from "./firebase-init.js";
 
-  if(!items.length){
-    host.innerHTML = '';
-    document.getElementById('summary').style.display='none';
-    document.getElementById('emptyBox').innerHTML = `
-      <div class="empty"><div class="e-ico">🛒</div><h3>سلتك فارغة حالياً</h3>
-      <p style="margin-bottom:20px">أضف بعض المنتجات الرقمية لتبدأ عملية الشراء.</p>
-      <a href="store.html" class="btn btn-primary">تصفّح المتجر ←</a></div>`;
-    return;
-  }
-  document.getElementById('summary').style.display='block';
-  document.getElementById('emptyBox').innerHTML='';
+        function renderCart() {
+            const cart = getCart();
+            const container = document.getElementById("cartContent");
 
-  host.innerHTML = items.map(c=>`
-    <div class="cart-item">
-      <div class="ci-thumb" style="background:${c.product.img}">${c.product.icon||'📦'}</div>
-      <div class="ci-info">
-        <h4>${c.product.title}</h4>
-        <small>${c.product.cat} · ${money(c.product.price)} للوحدة</small>
-      </div>
-      <div class="qty">
-        <button onclick="pay('${c.id}',${c.qty-1})">−</button>
-        <span>${c.qty}</span>
-        <button onclick="pay('${c.id}',${c.qty+1})">+</button>
-      </div>
-      <b style="min-width:100px;text-align:center">${money(c.product.price*c.qty)}</b>
-      <button class="icon-btn" onclick="del('${c.id}')" aria-label="حذف">🗑</button>
-    </div>`).join('');
+            if (cart.length === 0) {
+                container.innerHTML = `<div class="empty"><p style="margin-bottom:15px;">سلتك فارغة حالياً 😔</p><a href="shop.html">تصفح المنتجات الآن 🚀</a></div>`;
+                return;
+            }
 
-  const sub = cartSubtotal();
-  const d = sub * discount;
-  const tax = (sub - d) * 0.15;
-  document.getElementById('sub').textContent = money(sub);
-  document.getElementById('disc').textContent = '- ' + money(d);
-  document.getElementById('tax').textContent = money(tax);
-  document.getElementById('tot').textContent = money(sub - d + tax);
-}
-document.addEventListener('DOMContentLoaded', render);
-</script>
+            let total = 0;
+            let html = '';
+            cart.forEach((item, index) => {
+                const priceNum = parseFloat(String(item.price).replace(/[^0-9.]/g, '')) || 0;
+                total += priceNum;
+                html += `
+                    <div class="cart-item">
+                        <div class="cart-item-info">
+                            <strong>${esc(item.title || item.name)}</strong>
+                            <span>${esc(item.price)}</span>
+                        </div>
+                        <div class="cart-actions">
+                            <button class="btn-remove" data-index="${index}">🗑️ إزالة</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `
+                <div class="cart-total">
+                    <span>المجموع الكلي:</span>
+                    <span>${total.toFixed(2)} $</span>
+                </div>
+                <a href="checkout.html" class="btn-checkout">إتمام الدفع 💳</a>
+                <a href="shop.html" class="btn-continue">← متابعة التسوق</a>
+            `;
+            container.innerHTML = html;
+
+            container.querySelectorAll('.btn-remove').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const cartArr = getCart();
+                    cartArr.splice(parseInt(btn.dataset.index), 1);
+                    saveCart(cartArr);
+                    renderCart();
+                });
+            });
+        }
+
+        renderCart();
+    </script>
+    <script type="module" src="./site-enhance.js"></script>
 </body>
 </html>

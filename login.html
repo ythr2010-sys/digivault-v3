@@ -1,65 +1,432 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" data-theme="light">
+<html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>تسجيل الدخول | رقميّات ستور</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول وإجراء حساب | الخزنة الرقمية</title>
+    
+    <!-- خط Tajawal -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    
+    <!-- الملفات الخارجية (اختياري إن وجد) -->
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        :root {
+            --bg-main: #0a0a12;
+            --bg-card: #141424;
+            --accent-cyan: #00d2ff;
+            --accent-purple: #8a2be2;
+            --border-line: rgba(255, 255, 255, 0.08);
+            --text-main: #ffffff;
+            --text-sub: #a0a0c0;
+            --danger-red: #ff4757;
+            --success-green: #10b981;
+        }
+
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 420px;
+            margin: auto;
+        }
+
+        .auth-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-line);
+            border-radius: 16px;
+            padding: 35px 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+
+        .auth-card h2 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+
+        .auth-card h2 span { 
+            color: var(--accent-cyan); 
+        }
+
+        .auth-card p.subtitle {
+            color: var(--text-sub);
+            font-size: 0.9rem;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+            text-align: right;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+            color: var(--text-sub);
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-line);
+            border-radius: 8px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.3s ease, background 0.3s ease;
+        }
+
+        .form-group input:focus {
+            border-color: var(--accent-cyan);
+            background: rgba(0, 210, 255, 0.02);
+        }
+
+        .toggle-password {
+            position: absolute;
+            left: 12px;
+            background: none;
+            border: none;
+            color: var(--text-sub);
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-family: inherit;
+        }
+
+        .btn-submit, .btn-google {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            font-family: inherit;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            color: #fff;
+            border: none;
+            font-weight: 800;
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 210, 255, 0.3);
+        }
+
+        .btn-google {
+            background: #ffffff;
+            color: #222;
+            border: none;
+        }
+
+        .btn-google:hover:not(:disabled) {
+            background: #f0f0f0;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            color: var(--text-sub);
+            font-size: 0.85rem;
+        }
+
+        .divider::before, .divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid var(--border-line);
+        }
+
+        .divider span { 
+            padding: 0 10px; 
+        }
+
+        .toggle-auth {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: var(--text-sub);
+        }
+
+        .toggle-auth a {
+            color: var(--accent-cyan);
+            text-decoration: none;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        .toggle-auth a:hover {
+            text-decoration: underline;
+        }
+
+        .alert-message {
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            margin-bottom: 18px;
+            display: none;
+            text-align: right;
+        }
+
+        .alert-error {
+            background: rgba(255, 71, 87, 0.15);
+            border: 1px solid var(--danger-red);
+            color: var(--danger-red);
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid var(--success-green);
+            color: var(--success-green);
+        }
+    </style>
 </head>
 <body>
-<div id="site-header"></div>
 
-<section class="section">
-  <div class="container">
-    <div class="form-wrap">
-      <div class="form-card">
-        <div style="text-align:center;margin-bottom:26px">
-          <div class="logo-mark" style="margin:0 auto 14px;width:54px;height:54px;font-size:26px">◈</div>
-          <h2 style="font-size:24px">مرحباً بعودتك 👋</h2>
-          <p style="color:var(--muted);font-size:14.5px">سجّل الدخول للوصول إلى حسابك ومشترياتك</p>
+    <div class="auth-container">
+        <div class="auth-card">
+            <h2>الخزنة <span>الرقمية</span></h2>
+            <p id="formSubtitle" class="subtitle">أدخل بياناتك للدخول إلى حسابك</p>
+
+            <div id="alertBox" class="alert-message"></div>
+
+            <form id="authForm" novalidate>
+                <div class="form-group" id="nameGroup" style="display: none;">
+                    <label for="userName">الاسم الكامل</label>
+                    <input type="text" id="userName" placeholder="محمد علي">
+                </div>
+
+                <div class="form-group">
+                    <label for="userEmail">البريد الإلكتروني</label>
+                    <input type="email" id="userEmail" required placeholder="name@example.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="userPassword">كلمة المرور</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="userPassword" required placeholder="••••••••">
+                        <button type="button" id="togglePasswordBtn" class="toggle-password">إظهار</button>
+                    </div>
+                </div>
+
+                <button type="submit" id="btnSubmit" class="btn-submit">تسجيل الدخول</button>
+            </form>
+
+            <div class="divider"><span>أو</span></div>
+
+            <button id="btnGoogle" class="btn-google" type="button">
+                <svg width="18" height="18" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                </svg>
+                متابعة باستخدام Google
+            </button>
+
+            <div class="toggle-auth">
+                <span id="toggleText">ليس لديك حساب؟</span>
+                <a href="#" id="toggleBtn">إنشاء حساب جديد</a>
+            </div>
         </div>
-        <form id="loginForm">
-          <div class="form-group"><label>البريد الإلكتروني</label>
-            <input type="email" name="email" required placeholder="you@email.com"></div>
-          <div class="form-group"><label>كلمة المرور</label>
-            <input type="password" name="password" required placeholder="••••••••">
-            <div class="err" id="err"></div></div>
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;font-size:14px">
-            <label style="display:flex;gap:8px;align-items:center;font-weight:600">
-              <input type="checkbox" checked style="width:auto"> تذكّرني</label>
-            <a href="faq.html" style="color:var(--brand);font-weight:600">نسيت كلمة المرور؟</a>
-          </div>
-          <button class="btn btn-primary btn-block">تسجيل الدخول</button>
-        </form>
-        <div class="divider">أو</div>
-        <button class="btn btn-outline btn-block" onclick="toast('الدخول عبر Google غير مفعّل في النسخة التجريبية')">الدخول بواسطة Google</button>
-        <p style="text-align:center;margin-top:20px;font-size:14.5px;color:var(--muted)">
-          ليس لديك حساب؟ <a href="register.html" style="color:var(--brand);font-weight:700">أنشئ حساباً جديداً</a></p>
-      </div>
-      <div class="notice info" style="margin-top:20px">
-        💡 <b>تجربة سريعة:</b> أنشئ حساباً جديداً من صفحة التسجيل، أو استخدم بيانات أي حساب أنشأته سابقاً على هذا المتصفح.
-      </div>
     </div>
-  </div>
-</section>
 
-<div id="site-footer"></div>
-<script src="assets/js/app.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  if(currentUser()) toast('أنت مسجّل الدخول بالفعل');
-  document.getElementById('loginForm').addEventListener('submit', e=>{
-    e.preventDefault();
-    const f = Object.fromEntries(new FormData(e.target));
-    const err = document.getElementById('err');
-    try{
-      loginUser(f.email.trim().toLowerCase(), f.password);
-      toast('تم تسجيل الدخول بنجاح ✓','success');
-      setTimeout(()=>location.href='dashboard.html', 700);
-    }catch(ex){ err.textContent = ex.message; err.classList.add('show') }
-  });
-});
-</script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { 
+            getAuth, 
+            signInWithEmailAndPassword, 
+            createUserWithEmailAndPassword, 
+            GoogleAuthProvider, 
+            signInWithPopup, 
+            updateProfile 
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyClXL28rqPQr--pUu3N_Y-X3ihXEAKOyg8",
+            authDomain: "digivault-4c3a3.firebaseapp.com",
+            projectId: "digivault-4c3a3",
+            storageBucket: "digivault-4c3a3.firebasestorage.app",
+            messagingSenderId: "578335534171",
+            appId: "1:578335534171:web:1b108a849c0543f998a37e",
+            measurementId: "G-SZCB59ZZDN"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+
+        let isSignUp = false;
+
+        const authForm = document.getElementById('authForm');
+        const nameGroup = document.getElementById('nameGroup');
+        const btnSubmit = document.getElementById('btnSubmit');
+        const btnGoogle = document.getElementById('btnGoogle');
+        const formSubtitle = document.getElementById('formSubtitle');
+        const toggleBtn = document.getElementById('toggleBtn');
+        const toggleText = document.getElementById('toggleText');
+        const alertBox = document.getElementById('alertBox');
+        const togglePasswordBtn = document.getElementById('togglePasswordBtn');
+        const userPasswordInput = document.getElementById('userPassword');
+
+        function showAlert(msg, isError = true) {
+            alertBox.textContent = msg;
+            alertBox.className = `alert-message ${isError ? 'alert-error' : 'alert-success'}`;
+            alertBox.style.display = 'block';
+        }
+
+        function setloading(isLoading) {
+            btnSubmit.disabled = isLoading;
+            btnGoogle.disabled = isLoading;
+            btnSubmit.textContent = isLoading ? 'جاري المعالجة...' : (isSignUp ? 'إنشاء الحساب' : 'تسجيل الدخول');
+        }
+
+        togglePasswordBtn.addEventListener('click', () => {
+            const isPassword = userPasswordInput.type === 'password';
+            userPasswordInput.type = isPassword ? 'text' : 'password';
+            togglePasswordBtn.textContent = isPassword ? 'إخفاء' : 'إظهار';
+        });
+
+        function saveToLocal(user) {
+            const userProfile = {
+                uid: user.uid,
+                name: user.displayName || user.email.split('@')[0],
+                email: user.email,
+                picture: user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || user.email)}&background=00d2ff&color=fff`
+            };
+            localStorage.setItem("userProfile", JSON.stringify(userProfile));
+            localStorage.setItem("isLoggedIn", "true");
+        }
+
+        toggleBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            isSignUp = !isSignUp;
+            alertBox.style.display = 'none';
+
+            if (isSignUp) {
+                nameGroup.style.display = 'block';
+                btnSubmit.textContent = 'إنشاء الحساب';
+                formSubtitle.textContent = 'أنشئ حسابك لبدء استخدام الخزنة الرقمية';
+                toggleText.textContent = 'لديك حساب بالفعل؟';
+                toggleBtn.textContent = 'تسجيل الدخول';
+            } else {
+                nameGroup.style.display = 'none';
+                btnSubmit.textContent = 'تسجيل الدخول';
+                formSubtitle.textContent = 'أدخل بياناتك للدخول إلى حسابك';
+                toggleText.textContent = 'ليس لديك حساب؟';
+                toggleBtn.textContent = 'إنشاء حساب جديد';
+            }
+        });
+
+        authForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('userEmail').value.trim();
+            const password = userPasswordInput.value;
+            const name = document.getElementById('userName').value.trim();
+
+            if (!email || !password || (isSignUp && !name)) {
+                showAlert('يرجى ملء جميع الحقول المطلوبة.');
+                return;
+            }
+
+            setloading(true);
+            alertBox.style.display = 'none';
+
+            try {
+                if (isSignUp) {
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    await updateProfile(userCredential.user, { displayName: name });
+                    saveToLocal(userCredential.user);
+                    showAlert('تم إنشاء الحساب بنجاح! جاري تحويلك...', false);
+                } else {
+                    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                    saveToLocal(userCredential.user);
+                    showAlert('تم تسجيل الدخول بنجاح! جاري تحويلك...', false);
+                }
+
+                setTimeout(() => { window.location.href = 'index.html'; }, 1200);
+
+            } catch (error) {
+                console.error(error);
+                let message = 'حدث خطأ غير متوقع.';
+                switch (error.code) {
+                    case 'auth/email-already-in-use':
+                        message = 'هذا البريد الإلكتروني مستخدم بالفعل.';
+                        break;
+                    case 'auth/wrong-password':
+                    case 'auth/invalid-credential':
+                        message = 'البريد الإلكتروني أو كلمة المرور غير صحيحة.';
+                        break;
+                    case 'auth/weak-password':
+                        message = 'كلمة المرور ضعيفة، يجب أن تكون 6 أحرف على الأقل.';
+                        break;
+                    case 'auth/invalid-email':
+                        message = 'صيغة البريد الإلكتروني غير صالحة.';
+                        break;
+                }
+                showAlert(message);
+            } finally {
+                setloading(false);
+            }
+        });
+
+        btnGoogle.addEventListener('click', async () => {
+            setloading(true);
+            alertBox.style.display = 'none';
+            try {
+                const result = await signInWithPopup(auth, provider);
+                saveToLocal(result.user);
+                showAlert('تم تسجيل الدخول بنجاح عبر Google!', false);
+                setTimeout(() => { window.location.href = 'index.html'; }, 1200);
+            } catch (error) {
+                console.error(error);
+                showAlert('فشل أو تم إلغاء تسجيل الدخول عبر Google.');
+                setloading(false);
+            }
+        });
+    </script>
+    <script type="module" src="./site-enhance.js"></script>
 </body>
 </html>
